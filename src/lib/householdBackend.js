@@ -1,11 +1,11 @@
 import { requireSupabase } from './supabase.js';
 
-export async function createAccount({ email, password, name }) {
+export async function createAccount({ email, password, name, emailRedirectTo }) {
   const client = requireSupabase();
   const { data, error } = await client.auth.signUp({
     email: email.trim().toLowerCase(),
     password,
-    options: { data: { display_name: name.trim() } },
+    options: { data: { display_name: name.trim() }, ...(emailRedirectTo ? { emailRedirectTo } : {}) },
   });
   if (error) throw error;
   return data;
