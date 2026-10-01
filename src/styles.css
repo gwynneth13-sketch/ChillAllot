@@ -57,3 +57,9 @@ input[type="number"]{-moz-appearance:textfield;appearance:textfield}input[type="
 @media(max-width:640px){.badge-settings{padding:12px}.badge-color-options,.badge-avatar-options{gap:10px}}
 
 .modal textarea{display:block;width:100%;min-height:64px;margin-top:6px;padding:10px 11px;resize:vertical;border:1px solid var(--line);border-radius:7px;background:var(--card);color:var(--text);font:inherit;font-size:12px}.grocery-suggestions{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0 12px;padding:10px;border:1px solid var(--line);border-radius:8px;background:var(--card)}.grocery-suggestions button{border:1px solid var(--line);border-radius:14px;background:var(--panel);color:var(--text);padding:6px 9px;font-size:10px}.grocery-suggestions button:focus-visible,.grocery-suggestions button:hover{border-color:var(--accent);color:var(--accent);outline:none}.shopping-note{display:block;margin-top:3px;color:var(--text)!important}
+
+.household-selector{display:block;margin-bottom:24px;color:var(--muted);font-size:11px}.household-selector select{display:block;width:100%;max-width:360px;margin-top:6px;padding:10px 12px;border:1px solid var(--line);border-radius:8px;background:var(--panel);color:var(--text);font:inherit}.household-selector select:focus-visible{outline:2px solid var(--sage);outline-offset:2px}
+
+.appointment-date{width:auto;min-width:72px;padding:0 6px}.appointment-date small{font-size:10px;white-space:nowrap}
+
+.shopping-list-heading{display:flex;align-items:center;gap:12px}.shopping-list-heading button{margin-left:auto}.shopping-list-heading button:disabled{opacity:.4;cursor:not-allowed}.shopping-list-heading>span{float:none}
