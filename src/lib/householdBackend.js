@@ -66,8 +66,11 @@ export async function updateMyBadge({ color, avatar }) {
   const client = requireSupabase();
   const { data: { user }, error: authError } = await client.auth.getUser();
   if (authError) throw authError;
-  const { error } = await client.from('profiles').update({ badge_color: color, avatar_key: avatar || 'initial', updated_at: new Date().toISOString() }).eq('id', user.id);
+  if (!user) throw new Error('Sign in to save your badge.');
+  const { data, error } = await client.from('profiles').update({ badge_color: color, avatar_key: avatar || 'initial', updated_at: new Date().toISOString() }).eq('id', user.id).select('display_name,badge_color,avatar_key').single();
   if (error) throw error;
+  if (!data) throw new Error('Your profile was not saved. Please try again.');
+  return data;
 }
 
 export async function createHousehold(name) {
