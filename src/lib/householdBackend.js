@@ -104,3 +104,12 @@ export async function writeHouseholdData(householdId, dataKey, payload) {
     });
   if (error) throw error;
 }
+
+export async function requestPasswordReset(email) {
+ const {error}=await requireSupabase().auth.resetPasswordForEmail(email.trim().toLowerCase(),{redirectTo:window.location.origin+'/?reset=password'});
+ if(error)throw error;
+}
+export async function changePassword(password,currentPassword) {
+ const {error}=await requireSupabase().auth.updateUser({password,...(currentPassword?{current_password:currentPassword}:{})});
+ if(error)throw error;
+}
