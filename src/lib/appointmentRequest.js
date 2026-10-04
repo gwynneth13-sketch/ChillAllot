@@ -1,0 +1,2 @@
+import {supabase} from './supabase.js';
+export async function appointmentRequest(home,operation='list',id='',values={}){const {data,error}=await supabase.rpc('appointment_workspace',{target_household:home,operation,target_appointment:id,input_values:values});if(error)throw Error(error.code==='PGRST202'?'The appointment database update is needed before this screen can be used.':error.message);return data;}
