@@ -178,3 +178,5 @@ input[type="number"]{-moz-appearance:textfield;appearance:textfield}input[type="
 .modal .date-trigger{top:20px}
 
 .chore-footer>div{min-width:0}.chore-footer button{font-weight:600;white-space:nowrap}.chore-footer{gap:6px}.chore-footer .small{padding:8px 10px}.chore-snooze-modal{width:100%;max-width:360px}
+
+.chore-undo{display:flex;align-items:center;gap:14px;max-width:calc(100vw - 32px)}.chore-undo button{flex-shrink:0}
