@@ -132,3 +132,5 @@ input[type="number"]{-moz-appearance:textfield;appearance:textfield}input[type="
 .bill-editor .calendar-popover{left:0;right:auto;width:100%;max-width:310px}.amount-modal{max-width:400px}.amount-modal .modal-actions button{font-weight:600}
 
 .bill-delete-confirm{margin-top:16px;padding:14px;border:1px solid var(--border);border-radius:12px}.bill-delete-confirm p{font-size:13px;line-height:1.5;margin:8px 0 12px}.bill-delete-confirm>div{display:flex;gap:10px;flex-wrap:wrap}.bill-delete-confirm button{font-weight:600}
+
+@media(max-width:420px){.bill-editor .modal-actions{gap:6px}.bill-editor .modal-actions button{min-width:0;padding:10px 6px;font-size:11px;white-space:nowrap}}
