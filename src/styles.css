@@ -134,3 +134,5 @@ input[type="number"]{-moz-appearance:textfield;appearance:textfield}input[type="
 .bill-delete-confirm{margin-top:16px;padding:14px;border:1px solid var(--border);border-radius:12px}.bill-delete-confirm p{font-size:13px;line-height:1.5;margin:8px 0 12px}.bill-delete-confirm>div{display:flex;gap:10px;flex-wrap:wrap}.bill-delete-confirm button{font-weight:600}
 
 @media(max-width:420px){.bill-editor .modal-actions{gap:6px}.bill-editor .modal-actions button{min-width:0;padding:10px 6px;font-size:11px;white-space:nowrap}}
+
+.bill-editor .modal-actions{width:100%;flex-wrap:nowrap}.bill-editor .modal-actions button{flex:1;min-width:0;white-space:nowrap}.bill-delete-confirm>div{flex-wrap:nowrap}.bill-delete-confirm>div button{flex:1;min-width:0;white-space:nowrap}
