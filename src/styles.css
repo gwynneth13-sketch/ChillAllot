@@ -174,3 +174,5 @@ input[type="number"]{-moz-appearance:textfield;appearance:textfield}input[type="
 /* Full-width date fields keep the calendar centered within the form. */
 .modal .date-control .calendar-popover{position:relative;left:auto;right:auto;top:auto;width:100%;max-width:310px;box-sizing:border-box;margin:8px auto 0}
 .modal.appointment-editor .date-control .calendar-popover{left:calc(-100% - 10px);width:calc(200% + 10px);max-width:none;margin:8px 0 0}
+
+.modal .date-trigger{top:20px}
