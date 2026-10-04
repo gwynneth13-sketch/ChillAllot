@@ -186,3 +186,5 @@ input[type="number"]{-moz-appearance:textfield;appearance:textfield}input[type="
 .shopping-at-store{margin-top:12px}
 
 .shopping-list-tools button{height:42px;box-sizing:border-box;display:inline-flex;align-items:center;justify-content:center}
+
+.quick-grid{display:flex;flex-wrap:wrap;gap:8px}.quick-grid .quick{flex:0 1 auto;max-width:100%;overflow-wrap:anywhere;padding:10px 14px}.quick-empty{width:auto;max-width:100%;text-align:left}
