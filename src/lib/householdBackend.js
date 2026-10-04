@@ -115,3 +115,5 @@ export async function changePassword(password,currentPassword) {
 }
 
 export async function renameHousehold(householdId,name){const {data,error}=await requireSupabase().rpc('rename_household',{target_household:householdId,household_name:name});if(error)throw Error(error.code==='PGRST202'?'The household name database update is needed before saving.':error.message);return data;}
+
+export async function leaveHousehold(id,successor,confirm=false){const {data,error}=await requireSupabase().rpc('leave_household',{target_household:id,successor_id:successor,confirm_leave:confirm});if(error)throw Error(error.code==='PGRST202'?'The leave household database update is needed before continuing.':error.message);return data;}
