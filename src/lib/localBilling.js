@@ -17,14 +17,18 @@ export async function localBillRequest(home,op='list',id='',v={},account={id:'pr
   const b=rows.find(b=>b.id===id);
   if(op==='create'){if(b)throw Error('Bill already exists.');rows.push({...validate(v,actor,members),id,creatorId:actor,revision:1,cycles:[],preferences:{}});}
   else if(op!=='list'){
-    if(!b)throw Error('Bill not found.');
+    if(!b||b.deleted)throw Error('Bill not found.');
     if(op==='assign'){
       if(!members.some(m=>m.id===actor&&m.role==='Owner')||b.creatorId)throw Error('Only a household owner can assign an unassigned bill.');
       const old=structuredClone(b);Object.assign(b,validate(v,v.creatorId,members),{creatorId:v.creatorId,revision:1});
       b.cycles=[...(old.paymentHistory||[]),{due:old.due,payers:old.paid||[],amount:old.amount}].filter(c=>c.payers?.length).map(c=>({due:c.due,paidIds:c.payers.map(n=>members.find(m=>m.name===n)?.id).filter(Boolean),payerIds:b.payerIds,snapshot:{...validate(v,v.creatorId,members),due:c.due,amount:c.amount}}));
     }else{
       if(!allowed(b,actor))throw Error('Bill access is required.');
-      if(op==='edit'){
+      if(op==='delete'){
+        if(b.creatorId!==actor)throw Error('Only the creator can delete this bill.');
+        if(v.expectedRevision!==b.revision)throw Error('This bill changed in another window. Reopen it before deleting.');
+        b.deleted=true;
+      }else if(op==='edit'){
         if(b.creatorId!==actor)throw Error('Only the creator can edit the shared bill.');
         if(v.expectedRevision!==b.revision)throw Error('This bill changed in another window. Reopen it before saving.');
         const next=validate(v,actor,members);if(b.cycles.some(c=>c.due===b.due&&c.paidIds.length)&&['due','amount','payerIds','allocations'].some(k=>JSON.stringify(next[k])!==JSON.stringify(b[k])))throw Error('Undo recorded payments before changing the due date, amount, or payers.');
@@ -61,7 +65,7 @@ export async function localBillRequest(home,op='list',id='',v={},account={id:'pr
   }
   if(b&&['edit','amount','clearAmount','pay','undo'].includes(op))b.revision=(b.revision||1)+1;
   localStorage.setItem(key,JSON.stringify(rows));
-  return rows.filter(b=>!b.creatorId?members.some(m=>m.id===actor&&m.role==='Owner'):allowed(b,actor)).map(b=>{
+  return rows.filter(b=>!b.deleted).filter(b=>!b.creatorId?members.some(m=>m.id===actor&&m.role==='Owner'):allowed(b,actor)).map(b=>{
     if(!b.creatorId)return {...b,preferences:undefined};
     const {preferences,cycles,...shared}=b,own=preferences[actor]||{};
     return {...shared,...own,defaults:settings(shared),currentPaidIds:cycles.find(c=>c.due===b.due)?.paidIds||[],cycles:cycles.filter(c=>c.paidIds.includes(actor)).map(c=>({...c,snapshot:{...c.snapshot,...own}}))};

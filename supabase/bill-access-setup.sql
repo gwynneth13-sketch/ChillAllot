@@ -99,7 +99,7 @@ begin
     insert into private.bills(household_id,id,creator_id,record) values(h,bill_id,actor,item);
   elsif op<>'list' then
     select * into b from private.bills where household_id=h and id=bill_id for update;
-    if not found then raise exception 'Bill not found';end if;
+    if not found or coalesce((b.record->>'deleted')::boolean,false) then raise exception 'Bill not found';end if;
     visible:=b.creator_id=actor or (b.creator_id is not null and (b.record->>'visibility'='household' or (b.record->>'visibility'='selected' and b.record->'viewerIds' @> jsonb_build_array(actor::text))));
     if op='assign' then
       if not owner or b.creator_id is not null then raise exception 'Only a household owner can assign an unassigned bill';end if;
@@ -115,6 +115,10 @@ begin
       end loop;
       update private.bills set creator_id=creator,record=item,cycles=new_cycles,revision=revision+1 where household_id=h and id=bill_id;
     elsif not coalesce(visible,false) then raise exception 'Bill access is required';
+    elsif op='delete' then
+      if b.creator_id<>actor then raise exception 'Only the creator can delete this bill';end if;
+      if (v->>'expectedRevision')::bigint is distinct from b.revision then raise exception 'This bill changed in another window. Reopen it before deleting';end if;
+      update private.bills set record=jsonb_set(record,'{deleted}','true'),revision=revision+1 where household_id=h and id=bill_id;
     elsif op='edit' then
       if b.creator_id<>actor then raise exception 'Only the creator can edit the shared bill';end if;
       if (v->>'expectedRevision')::bigint is distinct from b.revision then raise exception 'This bill changed in another window. Reopen it before saving';end if;
@@ -167,7 +171,7 @@ begin
     case when x.creator_id is null then x.record||jsonb_build_object('id',x.id,'creatorId',null,'cycles','[]'::jsonb)
     else x.record||coalesce(x.preferences->actor::text,'{}')||jsonb_build_object('id',x.id,'creatorId',x.creator_id::text,'revision',x.revision,'currentPaidIds',coalesce((select c->'paidIds' from jsonb_array_elements(x.cycles) c where c->>'due'=x.record->>'due'),'[]'::jsonb),'defaults',private.bill_settings(x.record),'cycles',coalesce((select jsonb_agg(c||jsonb_build_object('snapshot',(c->'snapshot')||coalesce(x.preferences->actor::text,'{}'))) from jsonb_array_elements(x.cycles) c where c->'paidIds' @> jsonb_build_array(actor::text)),'[]'::jsonb)) end
     order by x.id),'[]') into result
-  from private.bills x where x.household_id=h and ((x.creator_id is null and owner) or x.creator_id=actor or (x.creator_id is not null and (x.record->>'visibility'='household' or (x.record->>'visibility'='selected' and x.record->'viewerIds' @> jsonb_build_array(actor::text)))));
+  from private.bills x where x.household_id=h and not coalesce((x.record->>'deleted')::boolean,false) and ((x.creator_id is null and owner) or x.creator_id=actor or (x.creator_id is not null and (x.record->>'visibility'='household' or (x.record->>'visibility'='selected' and x.record->'viewerIds' @> jsonb_build_array(actor::text)))));
   return result;
 end $$;
 
