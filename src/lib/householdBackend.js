@@ -33,7 +33,9 @@ export async function getHouseholdsForUser(userId) {
     .select('role,households(id,name,invite_code,created_at)')
     .eq('user_id', userId);
   if (error) throw error;
-  return (data || []).map(({ role, households }) => ({ ...households, role }));
+  const {data:preferences,error:preferenceError}=await client.from('household_visibility').select('household_id,hidden').eq('user_id',userId);
+  if(preferenceError)throw preferenceError;
+  return (data || []).map(({ role, households }) => ({ ...households, role, hidden:preferences?.some(p=>p.household_id===households.id&&p.hidden)||false }));
 }
 
 export async function getHouseholdMembers(householdId) {
@@ -119,3 +121,8 @@ export async function renameHousehold(householdId,name){const {data,error}=await
 export async function leaveHousehold(id,successor,confirm=false){const {data,error}=await requireSupabase().rpc('leave_household',{target_household:id,successor_id:successor,confirm_leave:confirm});if(error)throw Error(error.code==='PGRST202'?'The leave household database update is needed before continuing.':error.message);return data;}
 
 export async function householdDepartureNotice(id,operation='list',noticeId=null){const {data,error}=await requireSupabase().rpc('household_departure_notice',{target_household:id,operation,notice_id:noticeId});if(error)throw Error(error.code==='PGRST202'?'The household departure database update is needed before notices can load.':error.message);return data;}
+
+export async function setHouseholdHidden(householdId,hidden){
+ const client=requireSupabase();const {data,error:authError}=await client.auth.getUser();if(authError)throw authError;if(!data.user)throw Error('Please sign in again.');
+ const {error}=await client.from('household_visibility').upsert({household_id:householdId,user_id:data.user.id,hidden},{onConflict:'household_id,user_id'});if(error)throw error;
+}
