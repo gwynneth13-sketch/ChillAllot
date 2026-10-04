@@ -166,3 +166,5 @@ input[type="number"]{-moz-appearance:textfield;appearance:textfield}input[type="
 .modal .supply-editor-item>label{display:block;font-size:10px;color:var(--muted);line-height:1.25;margin:12px 0}
 .modal .supply-editor-item>label.check-option{display:flex;align-items:center;gap:8px;font-size:10px!important}
 .modal .supply-editor-item>label>input:not([type=checkbox]),.modal .supply-editor-item>label>select{display:block;margin-top:6px}
+
+.custom-interval-row{grid-template-columns:minmax(0,.75fr) minmax(0,1.25fr);width:100%;max-width:100%}.custom-interval-row>label{min-width:0}.custom-interval-row input,.custom-interval-row select{width:100%;min-width:0;max-width:100%;box-sizing:border-box}
