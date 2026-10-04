@@ -23,3 +23,13 @@ export function clearInvitation() {
   url.searchParams.delete('invite');
   window.history.replaceState(null, '', url.pathname + url.search + url.hash);
 }
+
+export function invitationCode(value) {
+  const text=String(value||'').trim();
+  try {
+    const link=new URL(text);
+    const code=link.searchParams.get('invite');
+    if(code) return code.trim();
+  } catch {}
+  return text;
+}
