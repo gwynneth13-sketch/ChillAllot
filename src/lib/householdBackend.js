@@ -113,3 +113,5 @@ export async function changePassword(password,currentPassword) {
  const {error}=await requireSupabase().auth.updateUser({password,...(currentPassword?{current_password:currentPassword}:{})});
  if(error)throw error;
 }
+
+export async function renameHousehold(householdId,name){const {data,error}=await requireSupabase().rpc('rename_household',{target_household:householdId,household_name:name});if(error)throw Error(error.code==='PGRST202'?'The household name database update is needed before saving.':error.message);return data;}
