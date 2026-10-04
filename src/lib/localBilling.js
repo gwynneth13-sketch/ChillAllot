@@ -42,7 +42,8 @@ export async function localBillRequest(home,op='list',id='',v={},account={id:'pr
         const c=b.cycles.find(c=>c.due===v.due);
         if(!c?.paidIds.includes(actor))throw Error('You can undo only your own payment.');
         if(b.cycles.some(other=>other.due>c.due&&other.paidIds.length))throw Error('Undo later payments first.');
-        if(c.due!==b.due){if(nextBillDate(c.due,c.snapshot.cadence)!==b.due||['amount','payerIds','allocations','cadence','visibility','viewerIds','name','kind'].some(k=>JSON.stringify(b[k])!==JSON.stringify(c.snapshot[k])))throw Error('This bill changed after payment. Its older payment cannot be undone.');b.due=c.due;}
+        // Restore the unpaid occurrence without discarding later edits to bill details.
+        if(c.due!==b.due)b.due=c.due;
         c.paidIds=c.paidIds.filter(id=>id!==actor);
       }else throw Error('Unknown bill action.');
     }

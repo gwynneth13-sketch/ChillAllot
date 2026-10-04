@@ -141,9 +141,6 @@ begin
       if exists(select 1 from jsonb_array_elements(b.cycles) c where c->>'due'>old_due and jsonb_array_length(c->'paidIds')>0) then raise exception 'Undo your later payments first. Earlier payments cannot change a later paid cycle';end if;
       item:=b.record;
       if old_due<>item->>'due' then
-        next_due:=private.next_bill_date(old_due::date,cycle->'snapshot'->>'cadence')::text;
-        if next_due<>item->>'due' then raise exception 'This older payment cannot be undone after the bill schedule changed';end if;
-        if (item-'due'-'note'-'reminder'-'reminderTime'-'paymentLink'-'bankLink')<>((cycle->'snapshot')-'due'-'note'-'reminder'-'reminderTime'-'paymentLink'-'bankLink') then raise exception 'This bill changed after payment; its older payment cannot be undone';end if;
         item:=jsonb_set(item,'{due}',to_jsonb(old_due));
       end if;
       cycle:=jsonb_set(cycle,'{paidIds}',(cycle->'paidIds')-actor::text);
