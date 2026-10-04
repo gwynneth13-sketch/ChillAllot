@@ -121,6 +121,17 @@ begin
       item:=private.validate_bill(h,actor,v);
       if exists(select 1 from jsonb_array_elements(b.cycles) c where c->>'due'=b.record->>'due' and jsonb_array_length(c->'paidIds')>0) and (item->>'due'<>b.record->>'due' or item->'payerIds'<>b.record->'payerIds' or item->'allocations'<>b.record->'allocations' or item->'amount'<>b.record->'amount') then raise exception 'Undo recorded payments before changing the due date, amount, or payers';end if;
       update private.bills set record=item,revision=revision+1 where household_id=h and id=bill_id;
+    elsif op='amount' then
+      if b.record->>'amountType'<>'variable' or b.record->>'amount' is not null then raise exception 'This bill already has an amount. Refresh to see it';end if;
+      if v->>'due' is distinct from b.record->>'due' or (v->>'expectedRevision')::bigint is distinct from b.revision then raise exception 'This bill changed. Reopen Enter amount before saving';end if;
+      if v->>'amount' is null then raise exception 'Enter an amount';end if;
+      item:=private.validate_bill(h,b.creator_id,b.record||jsonb_build_object('amount',v->'amount'));
+      update private.bills set record=item,revision=revision+1 where household_id=h and id=bill_id;
+    elsif op='clearAmount' then
+      if b.record->>'amountType'<>'variable' then raise exception 'Only a variable bill amount can be cleared';end if;
+      if v->>'due' is distinct from b.record->>'due' or (v->>'expectedRevision')::bigint is distinct from b.revision then raise exception 'This bill changed. Refresh before clearing its amount';end if;
+      if exists(select 1 from jsonb_array_elements(b.cycles) c where c->>'due'=b.record->>'due' and jsonb_array_length(c->'paidIds')>0) then raise exception 'This amount cannot be cleared after a payment has been recorded';end if;
+      update private.bills set record=jsonb_set(record,'{amount}','null'::jsonb),revision=revision+1 where household_id=h and id=bill_id;
     elsif op in ('settings','resetSettings') then
       s:=case when op='settings' then jsonb_set(b.preferences,array[actor::text],private.bill_settings(v),true) else b.preferences-actor::text end;
       update private.bills set preferences=s where household_id=h and id=bill_id;

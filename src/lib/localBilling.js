@@ -29,6 +29,16 @@ export async function localBillRequest(home,op='list',id='',v={},account={id:'pr
         if(v.expectedRevision!==b.revision)throw Error('This bill changed in another window. Reopen it before saving.');
         const next=validate(v,actor,members);if(b.cycles.some(c=>c.due===b.due&&c.paidIds.length)&&['due','amount','payerIds','allocations'].some(k=>JSON.stringify(next[k])!==JSON.stringify(b[k])))throw Error('Undo recorded payments before changing the due date, amount, or payers.');
         Object.assign(b,next);
+      }else if(op==='amount'){
+        if(b.amountType!=='variable'||b.amount!=null)throw Error('This bill already has an amount. Refresh to see it.');
+        if(v.due!==b.due||v.expectedRevision!==b.revision)throw Error('This bill changed. Reopen Enter amount before saving.');
+        if(!Number.isFinite(v.amount)||v.amount<0||v.amount>999999999.99||Math.round(v.amount*100)/100!==v.amount)throw Error('Enter a valid amount in whole cents.');
+        b.amount=v.amount;
+      }else if(op==='clearAmount'){
+        if(b.amountType!=='variable')throw Error('Only a variable bill amount can be cleared.');
+        if(v.due!==b.due||v.expectedRevision!==b.revision)throw Error('This bill changed. Refresh before clearing its amount.');
+        if(b.cycles.some(c=>c.due===b.due&&c.paidIds.length))throw Error('This amount cannot be cleared after a payment has been recorded.');
+        b.amount=null;
       }else if(op==='settings')b.preferences[actor]=settings(v);
       else if(op==='resetSettings')delete b.preferences[actor];
       else if(op==='pay'){
@@ -49,7 +59,7 @@ export async function localBillRequest(home,op='list',id='',v={},account={id:'pr
       }else throw Error('Unknown bill action.');
     }
   }
-  if(b&&['edit','pay','undo'].includes(op))b.revision=(b.revision||1)+1;
+  if(b&&['edit','amount','clearAmount','pay','undo'].includes(op))b.revision=(b.revision||1)+1;
   localStorage.setItem(key,JSON.stringify(rows));
   return rows.filter(b=>!b.creatorId?members.some(m=>m.id===actor&&m.role==='Owner'):allowed(b,actor)).map(b=>{
     if(!b.creatorId)return {...b,preferences:undefined};
