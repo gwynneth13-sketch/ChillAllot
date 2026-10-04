@@ -65,4 +65,24 @@ create or replace function public.leave_household(target_household uuid,successo
 returns jsonb language sql security invoker set search_path='' as $$select private.leave_household(target_household,successor_id,confirm_leave)$$;
 revoke all on function public.leave_household(uuid,uuid,boolean) from public,anon;
 grant execute on function public.leave_household(uuid,uuid,boolean) to authenticated;
+alter table private.household_departures add column if not exists dismissed_by uuid[] not null default '{}';
+create or replace function private.household_departure_notice(h uuid,operation text,notice_id uuid default null)
+returns jsonb language plpgsql security definer set search_path='' as $$
+declare actor uuid:=auth.uid(); result jsonb;
+begin
+ if actor is null or not exists(select 1 from public.households home join public.household_members m on m.household_id=home.id and m.user_id=actor where home.id=h and home.created_by=actor) then raise exception 'Only the household owner can view departure notices.';end if;
+ if operation='dismiss' then
+  update private.household_departures set dismissed_by=array_append(dismissed_by,actor) where id=notice_id and household_id=h and not actor=any(dismissed_by);
+ elsif operation<>'list' then raise exception 'Unknown notice action.';end if;
+ select coalesce(jsonb_agg(jsonb_build_object('id',d.id,'name',coalesce(nullif(p.display_name,''),'A household member'),'leftAt',d.left_at,'successorName',d.summary->>'successorName','unpaidShares',d.summary->'unpaidShares','sharedBills',d.summary->'sharedBills','appointments',d.summary->'appointments','transferredOwnership',d.summary->'transfersOwnership') order by d.left_at desc),'[]') into result
+ from private.household_departures d left join public.profiles p on p.id=d.user_id where d.household_id=h and not actor=any(d.dismissed_by);
+ return result;
+end;$$;
+revoke all on function private.household_departure_notice(uuid,text,uuid) from public,anon;
+grant execute on function private.household_departure_notice(uuid,text,uuid) to authenticated;
+create or replace function public.household_departure_notice(target_household uuid,operation text default 'list',notice_id uuid default null)
+returns jsonb language sql security invoker set search_path='' as $$select private.household_departure_notice(target_household,operation,notice_id)$$;
+revoke all on function public.household_departure_notice(uuid,text,uuid) from public,anon;
+grant execute on function public.household_departure_notice(uuid,text,uuid) to authenticated;
+
 commit;
