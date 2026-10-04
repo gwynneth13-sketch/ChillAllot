@@ -180,3 +180,5 @@ input[type="number"]{-moz-appearance:textfield;appearance:textfield}input[type="
 .chore-footer>div{min-width:0}.chore-footer button{font-weight:600;white-space:nowrap}.chore-footer{gap:6px}.chore-footer .small{padding:8px 10px}.chore-snooze-modal{width:100%;max-width:360px}
 
 .chore-undo{display:flex;align-items:center;gap:14px;max-width:calc(100vw - 32px)}.chore-undo button{flex-shrink:0}
+
+.shopping-list-tools{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:22px;flex-wrap:wrap}.shopping-list-tools button{font-weight:600}
