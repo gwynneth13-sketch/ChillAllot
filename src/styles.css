@@ -153,3 +153,5 @@ input[type="number"]{-moz-appearance:textfield;appearance:textfield}input[type="
 .join-requests{margin:16px 0;display:grid;gap:12px}.join-request{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px}.join-request p{color:var(--muted);font-size:13px;line-height:1.5;margin:8px 0 12px}.request-actions{display:flex;gap:10px;justify-content:flex-end}.request-actions button,.join-request>button{font-size:13px;font-weight:600}
 
 .leave-household{margin-top:20px;padding-top:16px;border-top:1px solid var(--line)}.leave-household>button{font-size:13px;font-weight:600}.leave-household-modal label{display:block;color:var(--muted);font-size:12px}.leave-household-modal select{display:block;width:100%;margin-top:6px}.leave-household-modal .modal-actions{flex-wrap:wrap}
+
+.badge-settings .photo-upload input[hidden]{display:none}.photo-library-button{display:block;margin-top:8px;font-size:13px;font-weight:600}
