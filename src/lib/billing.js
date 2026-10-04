@@ -24,7 +24,21 @@ export function billRows(bills,filter,userId,today,query='') {
     if(b.cadence==='One-time'&&b.payerIds.every(id=>(b.currentPaidIds||[]).includes(id)))return [];
     if(!mine)return filter==='Overdue'?(b.due<today?[{...b,source:b}]:[]):b.due>=today?[{...b,source:b}]:[];
     if(paid&&b.cadence==='One-time')return [];
-    const row=paid?{...b,due:nextBillDate(b.due,b.cadence),nextPreview:true,source:b}:{...b,source:b};
+    const row=paid?{...b,due:nextBillDate(b.due,b.cadence),amount:b.amountType==='variable'?null:b.amount,nextPreview:true,source:b}:{...b,source:b};
     return filter==='Overdue'?(row.due<today?[row]:[]):row.due>=today?[row]:[];
   }).filter(b=>b.name.toLowerCase().includes(query.trim().toLowerCase())&&(filter!=='Overdue'||b.due<today)).sort((a,b)=>filter==='Paid'?b.due.localeCompare(a.due):a.due.localeCompare(b.due));
+}
+
+// Allocate whole cents first, then distribute residual cents by largest remainder.
+// Member IDs break ties consistently, regardless of display order.
+export function splitBillAmounts(amount,allocations=[]) {
+  if(amount==null||!allocations.length)return [];
+  const cents=BigInt(Math.round(Number(amount)*100));
+  const weights=allocations.map(a=>BigInt(Number(a.percent).toFixed(12).replace('.','')));
+  const total=weights.reduce((n,w)=>n+w,0n);if(total<=0n)return [];
+  const parts=allocations.map((a,i)=>({userId:a.userId,cents:cents*weights[i]/total,remainder:cents*weights[i]%total}));
+  const remaining=Number(cents-parts.reduce((n,a)=>n+a.cents,0n));
+  const order=[...parts].sort((a,b)=>a.remainder>b.remainder?-1:a.remainder<b.remainder?1:a.userId.localeCompare(b.userId));
+  for(let i=0;i<remaining;i++)order[i].cents++;
+  return parts.map(a=>({userId:a.userId,amount:Number(a.cents)/100}));
 }

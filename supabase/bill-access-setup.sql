@@ -66,7 +66,7 @@ begin
   if visibility not in ('private','selected','household') or visibility is null then raise exception 'Choose who can see the bill';end if;
   if coalesce(length(trim(v->>'name')),0) not between 1 and 120 then raise exception 'Enter a bill name';end if;
   amount:=(v->>'amount')::numeric;
-  if amount is null or amount<0 or amount>999999999.99 or amount<>round(amount,2) then raise exception 'Enter a valid amount';end if;
+  if (amount is null and coalesce(v->>'amountType','fixed')<>'variable') or amount<0 or amount>999999999.99 or amount<>round(amount,2) then raise exception 'Enter a valid amount';end if;
   due:=(v->>'due')::date;
   if due is null then raise exception 'Choose a due date';end if;
   if v->>'cadence' not in ('One-time','Weekly','Monthly','Monthly · Variable','Variable Monthly','Annually') and coalesce(v->>'cadence','')!~'^Every [1-9][0-9]* (days?|weeks?|months?|years?)$' then raise exception 'Choose a valid repeat interval';end if;
@@ -83,7 +83,7 @@ begin
     if (select count(distinct s->>'userId') from jsonb_array_elements(allocations) s)<>jsonb_array_length(allocations) or jsonb_array_length(allocations)<>jsonb_array_length(payers) then raise exception 'Choose each payer once';end if;
   elsif payers<>jsonb_build_array(creator::text) then raise exception 'Choose a split for multiple payers';end if;
   select coalesce(jsonb_agg(jsonb_build_object('userId',s->>'userId','percent',(s->>'percent')::numeric)),'[]') into allocations from jsonb_array_elements(allocations) s;
-  result:=jsonb_build_object('name',trim(v->>'name'),'amount',amount,'due',due::text,'cadence',v->>'cadence','kind',case when v->>'kind'='Auto' then 'Auto' else 'Manual' end,'visibility',visibility,'viewerIds',case when visibility='selected' then viewers else '[]'::jsonb end,'payerIds',payers,'allocations',allocations);
+  result:=jsonb_build_object('name',trim(v->>'name'),'amount',amount,'amountType',case when v->>'amountType'='variable' then 'variable' else 'fixed' end,'due',due::text,'cadence',v->>'cadence','kind',case when v->>'kind'='Auto' then 'Auto' else 'Manual' end,'visibility',visibility,'viewerIds',case when visibility='selected' then viewers else '[]'::jsonb end,'payerIds',payers,'allocations',allocations);
   return result||private.bill_settings(v);
 end $$;
 
@@ -125,6 +125,7 @@ begin
       s:=case when op='settings' then jsonb_set(b.preferences,array[actor::text],private.bill_settings(v),true) else b.preferences-actor::text end;
       update private.bills set preferences=s where household_id=h and id=bill_id;
     elsif op='pay' then
+      if b.record->>'amount' is null then raise exception 'Enter the amount before marking paid';end if;
       if not b.record->'payerIds' @> jsonb_build_array(actor::text) then raise exception 'Only a payer can mark their own payment';end if;
       if v->>'due'<>b.record->>'due' or v->>'due' is null then raise exception 'This bill changed. Refresh before marking paid';end if;
       cycle:=null;select c into cycle from jsonb_array_elements(b.cycles) c where c->>'due'=v->>'due';
@@ -133,6 +134,7 @@ begin
       select coalesce(jsonb_agg(c),'[]') into new_cycles from jsonb_array_elements(b.cycles) c where c->>'due'<>v->>'due';new_cycles:=new_cycles||jsonb_build_array(cycle);
       item:=b.record;
       if (cycle->'paidIds') @> (cycle->'payerIds') then item:=jsonb_set(item,'{due}',to_jsonb(private.next_bill_date((item->>'due')::date,item->>'cadence')::text));end if;
+      if item->>'due'<>b.record->>'due' and item->>'amountType'='variable' then item:=jsonb_set(item,'{amount}','null'::jsonb);end if;
       update private.bills set record=item,cycles=new_cycles,revision=revision+1 where household_id=h and id=bill_id;
     elsif op='undo' then
       select c into cycle from jsonb_array_elements(b.cycles) c where c->>'due'=v->>'due';
@@ -142,6 +144,7 @@ begin
       item:=b.record;
       if old_due<>item->>'due' then
         item:=jsonb_set(item,'{due}',to_jsonb(old_due));
+        if item->>'amountType'='variable' then item:=jsonb_set(item,'{amount}',cycle->'snapshot'->'amount');end if;
       end if;
       cycle:=jsonb_set(cycle,'{paidIds}',(cycle->'paidIds')-actor::text);
       select coalesce(jsonb_agg(case when c->>'due'=old_due then cycle else c end),'[]') into new_cycles from jsonb_array_elements(b.cycles) c;

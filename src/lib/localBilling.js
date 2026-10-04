@@ -1,7 +1,7 @@
 // Isolated local app preview. Never reads or writes signed-in household data.
 import {nextBillDate} from './billing.js';
 const allowed=(b,id)=>b.creatorId===id||b.creatorId&&(b.visibility==='household'||b.visibility==='selected'&&b.viewerIds.includes(id));
-function validate(v,creator,members){const b=structuredClone(v);if(!b.name||!b.due||!Number.isFinite(b.amount)||b.amount<0)throw Error('Enter a name, amount, and date.');
+function validate(v,creator,members){const b=structuredClone(v);if(!b.name||!b.due||(b.amount==null?b.amountType!=='variable':!Number.isFinite(b.amount)||b.amount<0))throw Error('Enter a name, amount, and date.');
   if(!['private','selected','household'].includes(b.visibility)||b.payerIds.some(id=>!members.some(m=>m.id===id))||!b.payerIds.length)throw Error('Choose household members.');
   if(b.visibility==='private'&&(b.payerIds.length!==1||b.payerIds[0]!==creator))throw Error('A private bill has only its creator as payer.');
   if(b.visibility==='selected'&&b.payerIds.some(id=>id!==creator&&!b.viewerIds.includes(id)))throw Error('Share the bill with each payer.');
@@ -33,17 +33,18 @@ export async function localBillRequest(home,op='list',id='',v={},account={id:'pr
       else if(op==='resetSettings')delete b.preferences[actor];
       else if(op==='pay'){
         if(!b.payerIds.includes(actor))throw Error('Only a payer can mark their own payment.');
+        if(b.amount==null)throw Error('Enter the amount before marking paid.');
         if(v.due!==b.due)throw Error('This bill changed. Refresh before marking paid.');
         let c=b.cycles.find(c=>c.due===v.due);
         if(!c){const snapshot=Object.fromEntries(Object.entries(b).filter(([k])=>!['cycles','preferences'].includes(k)));c={due:v.due,paidIds:[],payerIds:b.payerIds,snapshot};b.cycles.push(c);}
         if(!c.paidIds.includes(actor))c.paidIds.push(actor);
-        if(c.payerIds.every(id=>c.paidIds.includes(id)))b.due=nextBillDate(b.due,b.cadence);
+        if(c.payerIds.every(id=>c.paidIds.includes(id))){const next=nextBillDate(b.due,b.cadence);if(next!==b.due&&b.amountType==='variable')b.amount=null;b.due=next;}
       }else if(op==='undo'){
         const c=b.cycles.find(c=>c.due===v.due);
         if(!c?.paidIds.includes(actor))throw Error('You can undo only your own payment.');
         if(b.cycles.some(other=>other.due>c.due&&other.paidIds.length))throw Error('Undo later payments first.');
         // Restore the unpaid occurrence without discarding later edits to bill details.
-        if(c.due!==b.due)b.due=c.due;
+        if(c.due!==b.due){b.due=c.due;if(b.amountType==='variable')b.amount=c.snapshot.amount;}
         c.paidIds=c.paidIds.filter(id=>id!==actor);
       }else throw Error('Unknown bill action.');
     }
