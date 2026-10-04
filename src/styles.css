@@ -139,3 +139,5 @@ input[type="number"]{-moz-appearance:textfield;appearance:textfield}input[type="
 
 .bill-editor .modal-actions button{flex:0 0 auto;width:auto}.bill-editor .modal-actions{justify-content:flex-end}
 @media(max-width:420px){.bill-editor .modal-actions button{padding:10px 7px;font-size:11px}}
+
+.appointment-editor .date-control:has(.calendar-popover){grid-column:1/-1}.appointment-editor .calendar-popover{position:relative;left:auto;right:auto;top:auto;width:min(310px,100%);max-width:100%;margin:8px auto 0}.appointment-editor .date-trigger{top:21px}.appointment-editor .form-row>*{min-width:0}
