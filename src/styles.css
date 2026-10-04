@@ -87,3 +87,34 @@ input[type="number"]{-moz-appearance:textfield;appearance:textfield}input[type="
 .member-switch .avatar.avatar-custom{width:36px;height:36px;font-size:26px;line-height:1}
 
 .avatar-custom{flex-shrink:0;padding:0}.badge-symbol{display:flex;align-items:center;justify-content:center;width:100%;height:100%;min-width:0;line-height:1;text-align:center}.member-switch .avatar.avatar-custom{display:flex;align-items:center;justify-content:center}.member-switch .badge-symbol{font-family:"Segoe UI Emoji","Apple Color Emoji","Noto Color Emoji",sans-serif;font-weight:400}
+
+/* Shared action palette and responsive bill details. */
+.app .outline,.app .plain,.app .text-button{color:var(--accent)}
+.app .toast{background:var(--panel);color:var(--text);border-color:var(--accent);max-width:calc(100vw - 32px)}
+.bill-main{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:start;gap:12px}
+.bill-title{min-width:0}.bill-details{display:flex;flex-wrap:wrap;gap:6px 14px;margin-top:6px;color:var(--muted);font-size:10px;line-height:1.5}.bill-details>span{max-width:100%}.bill-amount{min-width:0}.bill-amount small{line-height:1.5}.appointment-body{width:100%;min-width:0}
+@media(max-width:640px){.bill-main{grid-template-columns:minmax(0,1fr) auto}.bill-symbol{display:none}.bill-details{grid-column:1/-1}.bill-title>div{margin-bottom:8px}.bill-amount{max-width:155px}.bill-amount small{font-size:10px}.bill-details{font-size:11px}.bill-title{grid-column:1/-1}.bill-amount{grid-column:1/-1;justify-self:end;max-width:100%}.appointment-card{display:block}}
+
+/* Action buttons share the selected theme color; navigation retains selected states. */
+.app button.outline,.app button.plain{background:var(--accent);color:var(--bg);border:1px solid var(--accent)}
+.badge-color-controls{display:grid;gap:10px}
+.app button.plain{border-radius:8px}
+
+/* Bill title and total share the top row at every screen width. */
+.bill-main{grid-template-columns:minmax(0,1fr) auto;align-items:start}.bill-symbol{display:none}.bill-title,.bill-amount{grid-column:auto}.bill-title strong,.bill-amount strong{font:700 20px Manrope,sans-serif;line-height:1.3}.bill-title>div:first-child{align-items:baseline;flex-wrap:wrap}.bill-amount{justify-self:end;max-width:165px}.bill-payment-links{display:flex;flex-direction:column;align-items:flex-end;gap:6px;margin-top:6px}.bill-payment-links:empty{display:none}.bill-payment-links a{color:var(--accent)}
+.bill-amount>strong{display:block}
+
+/* Bill details keep complete values together; links align at the right of the action row. */
+.bill-title .bill-details{display:flex;flex-direction:column;align-items:flex-start;gap:6px}.bill-title .bill-due{font:700 11px Manrope,sans-serif;color:var(--text)}.bill-cadence{display:flex;flex-wrap:wrap;gap:6px 12px}.bill-split-lines{display:flex;flex-direction:column;gap:4px}.bill-split-lines>span{overflow-wrap:anywhere}.bill-footer{flex-wrap:wrap;gap:8px}.bill-footer .paid-status:empty{display:none}.bill-footer .paid-status:not(:empty){flex-basis:100%}.bill-footer>div{flex-wrap:wrap}.bill-footer .bill-footer-links{margin-left:auto;justify-content:flex-end}.bill-footer-links a{color:var(--accent)}
+.bill-footer{flex-direction:row;align-items:center}.bill-footer-links{align-items:center}
+.bill-footer button{font-weight:600}
+
+.badge-settings .initial-choice,.badge-settings .custom-emoji-label,.badge-settings .photo-upload{display:block;font-size:12px;font-weight:500;color:var(--muted);margin:14px 0}.badge-save-row button{font-weight:600}
+
+/* Appointments stay in one list, with date-based cleanup and consistent actions. */
+.appt-heading{flex-wrap:wrap;align-items:center}.appt-heading>strong{font:700 20px Manrope,sans-serif;line-height:1.3}.appt-heading .old-appointment{margin-left:auto;max-width:100%;font-weight:600}.appt-actions{display:flex;justify-content:flex-end;align-items:center;gap:8px;flex-wrap:wrap}.appt-actions button{font-weight:600}
+
+.notify-members{border:1px solid var(--line);border-radius:8px;padding:12px;margin:14px 0;min-width:0}.notify-members legend{font-size:11px;color:var(--muted)}.notify-members label{display:flex;align-items:center;gap:9px;min-height:40px;font-size:12px}.notify-members input[type=checkbox]{width:18px;height:18px;margin:0;accent-color:var(--accent)}
+
+.reminder-enable{display:flex!important;align-items:center;gap:9px;margin:14px 0!important}.reminder-enable input{width:18px!important;height:18px!important;margin:0!important;accent-color:var(--accent)}.reminder-controls{border:0;padding:0;margin:0;min-width:0}.reminder-controls:disabled{opacity:.45}.reminder-choice-row{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.5fr);gap:10px}.reminder-choice-row input,.reminder-choice-row select{width:100%;min-width:0}.reminder-time-label input{color-scheme:dark}.reminder-time-label input:disabled{opacity:.4}
+.modal .reminder-controls label{display:block;font-size:10px;font-weight:400;line-height:1.25;color:var(--muted);margin:12px 0}.modal .reminder-choice-row{align-items:end}.modal .reminder-controls input,.modal .reminder-controls select{display:block;margin-top:6px;min-height:40px}.modal .reminder-choice-row label{min-width:0}
