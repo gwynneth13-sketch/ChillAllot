@@ -143,3 +143,5 @@ input[type="number"]{-moz-appearance:textfield;appearance:textfield}input[type="
 .appointment-editor .calendar-popover{position:relative;left:calc(-100% - 10px);right:auto;top:auto;width:calc(200% + 10px);max-width:none;margin:8px 0 0}.appointment-editor .date-trigger{top:21px}.appointment-editor .form-row>*{min-width:0}
 
 .appointment-editor .form-row .date-control{margin:12px 0;font-size:10px}.appointment-editor .form-row select[name='for'],.appointment-editor .date-display{height:42px;box-sizing:border-box}.appointment-editor .form-row select[name='for']{margin-top:6px}.appointment-editor .date-trigger{top:21px}
+
+.app input[type='time']{color-scheme:dark}.app input[type='time']::-webkit-calendar-picker-indicator{filter:none;opacity:.85}.app[data-theme='Warm Light'] input[type='time']{color-scheme:light}.app .modal input[type='time']::-webkit-calendar-picker-indicator{filter:none;opacity:.85}
