@@ -190,3 +190,5 @@ input[type="number"]{-moz-appearance:textfield;appearance:textfield}input[type="
 .quick-grid{display:flex;flex-wrap:wrap;gap:8px}.quick-grid .quick{flex:0 1 auto;max-width:100%;overflow-wrap:anywhere;padding:10px 14px}.quick-empty{width:auto;max-width:100%;text-align:left}
 
 .shopping-list-tools button{font-size:11px;padding:7px 10px}
+
+.shopping-tabs{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0 20px}.shopping-tabs>button{border:1px solid var(--line);background:var(--panel);color:var(--muted);border-radius:8px;padding:8px 12px;font-size:12px;max-width:100%;overflow-wrap:anywhere}.shopping-tabs>button.selected{background:var(--sage-dark);color:var(--text);border-color:var(--sage)}.shopping-tab-add{display:flex;flex-wrap:wrap;gap:8px;align-items:flex-end;margin-bottom:20px}.shopping-tab-add label{flex:1 1 150px;min-width:0;font-size:10px;color:var(--muted)}.shopping-tab-add input{display:block;width:100%;margin-top:6px}.shopping-tab-add button{margin-bottom:1px}
