@@ -182,3 +182,5 @@ input[type="number"]{-moz-appearance:textfield;appearance:textfield}input[type="
 .chore-undo{display:flex;align-items:center;gap:14px;max-width:calc(100vw - 32px)}.chore-undo button{flex-shrink:0}
 
 .shopping-list-tools{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:22px;flex-wrap:wrap}.shopping-list-tools button{font-weight:600}
+
+.shopping-at-store{margin-top:12px}
