@@ -160,3 +160,9 @@ input[type="number"]{-moz-appearance:textfield;appearance:textfield}input[type="
 
 /* Chore details wrap as complete pieces on narrow screens. */
 .chore-top{align-items:flex-start;flex-wrap:wrap}.chore-title{min-width:0;flex:1 1 160px}.chore-title>strong{font:700 20px Manrope,sans-serif;line-height:1.3;overflow-wrap:anywhere}.chore-metadata{display:flex;flex-wrap:wrap;gap:6px 14px;margin-top:8px;color:var(--muted);font-size:12px}.chore-metadata>span{max-width:100%;overflow-wrap:anywhere}.chore-top .owner-badge{text-transform:none;letter-spacing:normal;max-width:100%;overflow-wrap:anywhere;flex-shrink:0}.chore-details{flex-wrap:wrap;gap:10px 20px}.chore-details>span{max-width:100%;overflow-wrap:anywhere}.chore-details small{margin-left:0}
+
+/* Supply controls share the standard form-label scale in add and edit. */
+.modal .supply-editor-title strong{font-size:10px;line-height:1.25}
+.modal .supply-editor-item>label{display:block;font-size:10px;color:var(--muted);line-height:1.25;margin:12px 0}
+.modal .supply-editor-item>label.check-option{display:flex;align-items:center;gap:8px;font-size:10px!important}
+.modal .supply-editor-item>label>input:not([type=checkbox]),.modal .supply-editor-item>label>select{display:block;margin-top:6px}
