@@ -168,3 +168,5 @@ input[type="number"]{-moz-appearance:textfield;appearance:textfield}input[type="
 .modal .supply-editor-item>label>input:not([type=checkbox]),.modal .supply-editor-item>label>select{display:block;margin-top:6px}
 
 .custom-interval-row{grid-template-columns:minmax(0,.75fr) minmax(0,1.25fr);width:100%;max-width:100%}.custom-interval-row>label{min-width:0}.custom-interval-row input,.custom-interval-row select{width:100%;min-width:0;max-width:100%;box-sizing:border-box}
+
+.chore-assignment{min-width:0}.chore-assignment-label,.chore-assignment>label{display:block;font-size:10px;color:var(--muted);margin:12px 0}.chore-member-choices{display:flex;flex-wrap:wrap;gap:8px}.chore-member-choices>label{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text)}.chore-member-choices input[type=checkbox]{width:16px;min-height:16px;height:16px;margin:0;flex:none}.chore-assignment>small{display:block;font-size:10px;color:var(--muted);margin-top:8px}.chore-assignment>label select{width:100%;margin-top:6px}
