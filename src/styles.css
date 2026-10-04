@@ -118,3 +118,10 @@ input[type="number"]{-moz-appearance:textfield;appearance:textfield}input[type="
 
 .reminder-enable{display:flex!important;align-items:center;gap:9px;margin:14px 0!important}.reminder-enable input{width:18px!important;height:18px!important;margin:0!important;accent-color:var(--accent)}.reminder-controls{border:0;padding:0;margin:0;min-width:0}.reminder-controls:disabled{opacity:.45}.reminder-choice-row{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.5fr);gap:10px}.reminder-choice-row input,.reminder-choice-row select{width:100%;min-width:0}.reminder-time-label input{color-scheme:dark}.reminder-time-label input:disabled{opacity:.4}
 .modal .reminder-controls label{display:block;font-size:10px;font-weight:400;line-height:1.25;color:var(--muted);margin:12px 0}.modal .reminder-choice-row{align-items:end}.modal .reminder-controls input,.modal .reminder-controls select{display:block;margin-top:6px;min-height:40px}.modal .reminder-choice-row label{min-width:0}
+
+.member-reminder+.member-reminder{border-top:1px solid var(--line);margin-top:8px;padding-top:8px}.member-reminder-options{padding-left:12px;border-left:2px solid var(--line);margin:4px 0 12px}.notify-members .member-reminder-options .reminder-controls label{display:block;min-height:0;font-size:10px}.notify-members .member-reminder-options .reminder-controls input[type=text],.notify-members .member-reminder-options .reminder-controls input[type=time]{width:100%;height:auto;margin-top:6px}.change-notification{margin-top:18px}
+
+.toolbar:has(.light-pills){flex-wrap:wrap;gap:10px}.toolbar .pills{flex-wrap:wrap}
+.toolbar .light-pills{display:flex}
+
+.bill-toolbar{flex-wrap:wrap;gap:10px}.bill-search{display:flex;align-items:center;flex-wrap:wrap;gap:8px;font-size:10px;color:var(--muted);margin-bottom:16px}.bill-search input{flex:1;min-width:120px;background:var(--bg);color:var(--text);border:1px solid var(--line);border-radius:8px;padding:10px}
