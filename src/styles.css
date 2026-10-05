@@ -230,3 +230,12 @@ input[type="number"]{-moz-appearance:textfield;appearance:textfield}input[type="
 .section-icon{display:block;width:18px;height:18px;flex:none}.home-icon .section-icon{width:38px;height:38px}.nav>span{display:flex;align-items:center;justify-content:center}@media(max-width:640px){.home-icon .section-icon{width:32px;height:32px}.nav .section-icon{width:15px;height:15px}}
 
 .notify-icon{display:flex;align-items:center;justify-content:center;color:var(--sage)}.notify-icon .section-icon,.quiet-hours>span .section-icon{width:22px;height:22px}.quiet-hours>span{color:var(--sage)}
+
+/* Softer accents; existing theme keys preserve saved selections. */
+.app{--sage:#9caa8e;--peach:#c39e87;--accent:#a8b198}
+.app[data-theme="Midnight"]{--sage:#7e9dc9;--peach:#b99fcf;--accent:#90acd9}
+.app[data-theme="Forest"]{--sage:#92ab8f;--peach:#b6a17c;--accent:#a7b6a0}
+.app[data-theme="Ocean"]{--sage:#8aafa9;--peach:#b99d8f;--accent:#9bb8b3}
+.app[data-theme="Sunset"]{--sage:#c29174;--peach:#c99e68;--accent:#c99d74}
+.app[data-theme="Warm Light"]{--bg:#ded7ca;--panel:#e9e2d6;--card:#eee8dd;--line:#c5bcac;--text:#353831;--muted:#61655b;--sage:#53694e;--sage-dark:#d0d9c8;--peach:#916950;--accent:#53694e}
+.swatch-4{background:#ded7ca}.swatch-4 i:nth-child(1){background:#e9e2d6}.swatch-4 i:nth-child(2){background:#d0d9c8}.swatch-4 i:nth-child(3){background:#53694e}
