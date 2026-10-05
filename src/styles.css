@@ -314,3 +314,11 @@ input[type="number"]{-moz-appearance:textfield;appearance:textfield}input[type="
 .app[data-theme="Forest"] .home-tile:nth-child(3){background:#896519;border-color:#a47e30;color:#fff}
 .app[data-theme="Forest"] .home-tile:nth-child(3) strong,.app[data-theme="Forest"] .home-tile:nth-child(3) small,.app[data-theme="Forest"] .home-tile:nth-child(3) .home-icon{color:#fff}
 .swatches.swatch-2 i:nth-child(3){background:#896519}
+
+/* Section color accents keep dark backgrounds and uniform gold actions. */
+.app[data-theme="Forest"] .content[data-section="Bills"]{--section-color:#dc8c82;--section-border:#99554e}
+.app[data-theme="Forest"] .content[data-section="Shopping"]{--section-color:#8cb3e9;--section-border:#496faa}
+.app[data-theme="Forest"] .content[data-section="Appointments"]{--section-color:#e3c16e;--section-border:#a47e30}
+.app[data-theme="Forest"] .content[data-section="Chores"]{--section-color:#8fc5ac;--section-border:#548772}
+.app[data-theme="Forest"] .content[data-section] .page-head h1,.app[data-theme="Forest"] .content[data-section] .page-head .eyebrow{color:var(--section-color,var(--text))}
+.app[data-theme="Forest"] .content[data-section] .bill-card,.app[data-theme="Forest"] .content[data-section] .shopping-list,.app[data-theme="Forest"] .content[data-section] .appointment-card,.app[data-theme="Forest"] .content[data-section] .chore-card{border-color:var(--section-border,var(--line));border-top-width:3px}
