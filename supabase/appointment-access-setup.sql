@@ -61,6 +61,10 @@ begin
    if a.creator_id is distinct from actor then raise exception 'Only the creator can edit appointment details';end if;
    if (v->>'expectedRevision')::bigint is distinct from a.revision then raise exception 'This appointment changed in another window. Reopen it before saving';end if;
    update private.appointments set record=item,preferences=jsonb_set(preferences,array[actor::text],pref),revision=revision+1 where household_id=h and id=aid;
+  elsif op='delete' then
+   if a.creator_id is distinct from actor then raise exception 'Only the creator can delete an appointment';end if;
+   if (v->>'expectedRevision')::bigint is distinct from a.revision then raise exception 'This appointment changed. Reopen it before deleting';end if;
+   delete from private.appointments where household_id=h and id=aid;
   elsif op='remove' then
    pref:=jsonb_build_object('removed',true,'reminder','','reminderTime','');
    update private.appointments set preferences=jsonb_set(preferences,array[actor::text],pref) where household_id=h and id=aid;
