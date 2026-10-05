@@ -34,6 +34,7 @@ begin
   update private.bills set household_id=personal_home,preferences=jsonb_build_object(actor::text,coalesce(preferences->actor::text,'{}')),revision=revision+1
   where household_id=h and creator_id=actor and record->>'visibility'='private';
  end if;
+ personal_home:=private.shopping_departure(h,actor,successor,personal_home);
  -- Keep all payments, payer allocations, and amounts exactly as recorded.
  update private.bills b set record=b.record||jsonb_build_object('departureReview',jsonb_build_object('userId',actor::text,'name',person)),revision=revision+1
  where household_id=h and record->>'visibility'<>'private' and not coalesce((record->>'deleted')::boolean,false)

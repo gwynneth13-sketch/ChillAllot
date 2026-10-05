@@ -53,4 +53,29 @@ begin
 end $$;
 revoke all on function public.shopping_workspace(uuid,text,jsonb) from public,anon;
 grant execute on function public.shopping_workspace(uuid,text,jsonb) to authenticated;
+-- Called only by the trusted leave-household transaction.
+create or replace function private.shopping_departure(h uuid,actor uuid,successor uuid,personal_home uuid default null) returns uuid language plpgsql security definer set search_path='' as $$
+declare w private.shopping_workspaces%rowtype;t jsonb;private_tabs jsonb:='[]';kept_tabs jsonb:='[]';private_data jsonb:='{}';kept_data jsonb:='{}';recipients jsonb;home_name text;
+begin
+ select * into w from private.shopping_workspaces where household_id=h for update;
+ if not found then return personal_home;end if;
+ for t in select value from jsonb_array_elements(w.payload->'tabs') loop
+  if t->>'creatorId'=actor::text and not exists(select 1 from jsonb_array_elements_text(t->'memberIds') r join public.household_members m on m.user_id::text=r and m.household_id=h where r<>actor::text) then
+   private_tabs:=private_tabs||jsonb_build_array(t||jsonb_build_object('memberIds',jsonb_build_array(actor::text)));
+   private_data:=jsonb_set(private_data,array[t->>'id'],coalesce(w.payload->'data'->(t->>'id'),'{}'),true);
+  else
+   recipients:=coalesce(t->'memberIds','[]')-actor::text;
+   if t->>'creatorId'=actor::text then t:=t||jsonb_build_object('creatorId',successor::text,'originalCreatorId',coalesce(t->>'originalCreatorId',actor::text));if not(recipients ? successor::text) then recipients:=recipients||jsonb_build_array(successor::text);end if;end if;
+   t:=t||jsonb_build_object('memberIds',recipients);kept_tabs:=kept_tabs||jsonb_build_array(t);kept_data:=jsonb_set(kept_data,array[t->>'id'],coalesce(w.payload->'data'->(t->>'id'),'{}'),true);
+  end if;
+ end loop;
+ if jsonb_array_length(private_tabs)>0 then
+  if personal_home is null then select coalesce(nullif(display_name,''),'My')||' · Personal' into home_name from public.profiles where id=actor;insert into public.households(name,created_by) values(left(coalesce(home_name,'My · Personal'),80),actor) returning id into personal_home;insert into public.household_members(household_id,user_id,role) values(personal_home,actor,'owner');end if;
+  insert into private.shopping_workspaces(household_id,payload) values(personal_home,jsonb_build_object('tabs',private_tabs,'data',private_data)) on conflict(household_id) do update set payload=jsonb_build_object('tabs',private.shopping_workspaces.payload->'tabs'||excluded.payload->'tabs','data',private.shopping_workspaces.payload->'data'||excluded.payload->'data'),revision=private.shopping_workspaces.revision+1;
+ end if;
+ update private.shopping_workspaces set payload=jsonb_build_object('tabs',kept_tabs,'data',kept_data),revision=revision+1 where household_id=h;
+ return personal_home;
+end $$;
+revoke all on function private.shopping_departure(uuid,uuid,uuid,uuid) from public,anon,authenticated;
+
 commit;
