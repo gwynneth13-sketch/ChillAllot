@@ -283,3 +283,28 @@ input[type="number"]{-moz-appearance:textfield;appearance:textfield}input[type="
 .swatches.swatch-2 i:nth-child(1){background:#547779}
 .swatches.swatch-2 i:nth-child(2){background:#91809e}
 .swatches.swatch-2 i:nth-child(3){background:#b79585}
+
+/* Button balance and a brighter primary-color Patchwork. */
+.app{--accent:#949f83}
+.app[data-theme="Midnight"]{--accent:#7b98c3}
+.app[data-theme="Ocean"]{--accent:#83a49e}
+.app[data-theme="Sunset"]{--accent:#b58a61}
+.app[data-theme="Warm Light"]{--accent:#a86d56}
+.app[data-theme="Warm Light"] .primary,.app[data-theme="Warm Light"] .outline{color:#191512}
+.swatches.swatch-0 i:nth-child(3){background:#949f83}
+.swatches.swatch-1 i:nth-child(3){background:#7b98c3}
+.swatches.swatch-3 i:nth-child(3){background:#83a49e}
+.swatches.swatch-4 i:nth-child(3){background:#a86d56}
+.swatches.swatch-5 i:nth-child(3){background:#b58a61}
+.app[data-theme="Forest"]{--bg:#18212c;--panel:#233044;--card:#29384c;--line:#475771;--text:#f0eee4;--muted:#bac3cf;--sage:#e0b951;--sage-dark:#344766;--peach:#d97769;--accent:#cfaa48}
+.app[data-theme="Forest"] .home-tile:nth-child(1){background:#99433d;border-color:#b66359}
+.app[data-theme="Forest"] .home-tile:nth-child(2){background:#315e9a;border-color:#507bb2}
+.app[data-theme="Forest"] .home-tile:nth-child(3){background:#d0ad4d;border-color:#dec16d;color:#262316}
+.app[data-theme="Forest"] .home-tile:nth-child(3) small,.app[data-theme="Forest"] .home-tile:nth-child(3) .home-icon{color:#443c24}
+.app[data-theme="Forest"] .home-tile:nth-child(4){background:#386a58;border-color:#548772}
+.app[data-theme="Forest"] .home-tile:not(:nth-child(3)) .home-icon{color:#f0eee4}
+.app[data-theme="Forest"] .home-tile:not(:nth-child(3)) small{color:#e0e5e8}
+.swatches.swatch-2{background:#18212c;border-color:#475771}
+.swatches.swatch-2 i:nth-child(1){background:#99433d}
+.swatches.swatch-2 i:nth-child(2){background:#315e9a}
+.swatches.swatch-2 i:nth-child(3){background:#cfaa48}
