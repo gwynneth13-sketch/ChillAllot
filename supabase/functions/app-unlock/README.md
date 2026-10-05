@@ -12,4 +12,6 @@ Build, SQL access/challenge tests, browser state tests, and real WebAuthn signat
 
 This is a browser privacy lock, not encryption of cached household data or a replacement for server authorization. Settings are per-account and per-browser. The signed-in Supabase session stays active while the UI is locked. No authenticated database policies rely on the client lock flag. Device credential verification uses an expiring single-use server challenge and required user verification.
 
-Pending: the requested sign-out confirmation, extension of the boundary to account-level household join/recovery views, deployed-function integration tests, physical phone test, and exact-item notification routing (notification delivery remains separate work).
+Pending: deployed-function integration tests, physical phone test, and exact-item notification routing (notification delivery remains separate work).
+
+Account-level join/loading/recovery/hidden-household views now share the same persistent unlock boundary. Sign out confirmation and cancellation are implemented, including the locked-screen escape route. Browser tests cover preserving an unfinished join code across a lock and canceling sign out.
