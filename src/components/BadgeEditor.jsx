@@ -7,8 +7,8 @@ export const badgeColor=value=>/^#[0-9a-f]{6}$/i.test(value||'')?value:colors[va
 export const avatarText=value=>value?.startsWith('initial:')?value.slice(8):value?.startsWith('emoji:')?value.slice(6):avatars[value]||'';
 export const isPhoto=value=>/^data:image\/jpeg;base64,[A-Za-z0-9+/=]+$/.test(value||'')&&value.length<=80000;
 export function MemberBadge({member,small=false,current=false}){
- const photo=isPhoto(member.avatarKey);
- return <span className={'avatar avatar-custom'+(small?' avatar-small':'')+(current?' avatar-current':'')} style={{'--badge-color':badgeColor(member.badgeColor)}}>{photo?<img src={member.avatarKey} alt=""/>:<span className="badge-symbol">{avatarText(member.avatarKey)||member.name?.[0]||'?'}</span>}</span>;
+ const photo=isPhoto(member.avatarKey),symbol=avatarText(member.avatarKey)||member.name?.[0]||'?',emoji=/\p{Extended_Pictographic}/u.test(symbol);
+ return <span className={'avatar avatar-custom'+(small?' avatar-small':'')+(current?' avatar-current':'')} style={{'--badge-color':badgeColor(member.badgeColor)}}>{photo?<img src={member.avatarKey} alt=""/>:<span className={'badge-symbol'+(emoji?' badge-emoji':'')}>{symbol}</span>}</span>;
 }
 function hslColor([h,s,l]){s/=100;l/=100;const a=s*Math.min(l,1-l),f=n=>{const k=(n+h/30)%12;return Math.round(255*(l-a*Math.max(-1,Math.min(k-3,9-k,1)))).toString(16).padStart(2,'0')};return '#'+f(0)+f(8)+f(4)}
 function colorHsl(value){const c=badgeColor(value),[r,g,b]=[1,3,5].map(i=>parseInt(c.slice(i,i+2),16)/255),max=Math.max(r,g,b),min=Math.min(r,g,b),d=max-min,l=(max+min)/2;return [d?((max===r?(g-b)/d:max===g?(b-r)/d+2:(r-g)/d+4)*60+360)%360:0,d?d/(1-Math.abs(2*l-1))*100:0,l*100]}

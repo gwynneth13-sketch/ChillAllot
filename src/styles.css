@@ -322,3 +322,5 @@ input[type="number"]{-moz-appearance:textfield;appearance:textfield}input[type="
 .app[data-theme="Forest"] .content[data-section="Chores"]{--section-color:#8fc5ac;--section-border:#548772}
 .app[data-theme="Forest"] .content[data-section] .page-head h1,.app[data-theme="Forest"] .content[data-section] .page-head .eyebrow{color:var(--section-color,var(--text))}
 .app[data-theme="Forest"] .content[data-section] .bill-card,.app[data-theme="Forest"] .content[data-section] .shopping-list,.app[data-theme="Forest"] .content[data-section] .appointment-card,.app[data-theme="Forest"] .content[data-section] .chore-card{border-color:var(--section-border,var(--line));border-top-width:3px}
+
+.top .icon-button{padding:0;display:flex;align-items:center;justify-content:center;color:var(--text)}.top .icon-button .section-icon{width:20px;height:20px}.badge-symbol.badge-emoji{font-family:"Segoe UI Emoji","Apple Color Emoji","Noto Color Emoji",sans-serif;font-weight:400;transform:translateY(-1px)}
