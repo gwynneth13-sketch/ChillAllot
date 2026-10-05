@@ -265,3 +265,6 @@ input[type="number"]{-moz-appearance:textfield;appearance:textfield}input[type="
 .swatches.swatch-5 i:nth-child(1){background:#2a211b}
 .swatches.swatch-5 i:nth-child(2){background:#3b2921}
 .swatches.swatch-5 i:nth-child(3){background:#c99d74}
+
+.app[data-theme="Warm Light"]{--accent:#8c503d}
+.swatches.swatch-4 i:nth-child(3){background:#8c503d}
