@@ -272,3 +272,14 @@ input[type="number"]{-moz-appearance:textfield;appearance:textfield}input[type="
 .app[data-theme="Warm Light"] .primary,.app[data-theme="Warm Light"] .outline{color:#eee8dd}
 
 .settings-nav button>span{display:flex;align-items:center;justify-content:center;color:var(--sage);flex:none}.settings-nav .section-icon{width:18px;height:18px}
+
+/* Patchwork replaces Forest while preserving saved theme selections. */
+.app[data-theme="Forest"]{--bg:#182124;--panel:#233135;--card:#29383b;--line:#435457;--text:#e5e5de;--muted:#aebdbb;--sage:#a5b7c8;--sage-dark:#34344a;--peach:#c6947e;--accent:#b79585}
+.app[data-theme="Forest"] .home-tile:nth-child(1){background:#30474a;border-color:#536a6b}
+.app[data-theme="Forest"] .home-tile:nth-child(2){background:#493831;border-color:#70594e}
+.app[data-theme="Forest"] .home-tile:nth-child(3){background:#3c354d;border-color:#625870}
+.app[data-theme="Forest"] .home-tile:nth-child(4){background:#35463f;border-color:#566b60}
+.swatches.swatch-2{background:#182124;border-color:#435457}
+.swatches.swatch-2 i:nth-child(1){background:#547779}
+.swatches.swatch-2 i:nth-child(2){background:#91809e}
+.swatches.swatch-2 i:nth-child(3){background:#b79585}
