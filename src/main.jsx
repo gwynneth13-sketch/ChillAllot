@@ -6,7 +6,7 @@ import {recordAddition,selectSuggestion,suggestions} from './lib/shoppingSuggest
 import ChoreSnooze from './components/ChoreSnooze.jsx';
 import ChoreAssignment from './components/ChoreAssignment.jsx';
 import {advanceChore,reconcileChore} from './lib/choreRotation.js';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { createRoot } from 'react-dom/client';
 import { isSupabaseConfigured, supabase } from './lib/supabase.js';
 import { createAccount, signIn, signOut, getHouseholdsForUser, getHouseholdMembers, getMyProfile, updateMyBadge, createHousehold, joinHousehold, readHouseholdData, writeHouseholdData, renameHousehold, setHouseholdHidden } from './lib/householdBackend.js';
