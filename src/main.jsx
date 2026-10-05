@@ -1,3 +1,4 @@
+import AppUnlockBoundary from './components/AppUnlockBoundary.jsx';
 import UnlockPreferences from './components/UnlockPreferences.jsx';
 import NotificationInbox from './components/NotificationInbox.jsx';
 import {useShopping} from './lib/shopping.js';
@@ -65,7 +66,8 @@ function InviteActions({household}){
  return <div className="invite-box"><strong>Invite someone in</strong><p>Share an invitation to join your household.{approval&&' The household owner will approve their request to join.'}</p>{code?<><label className="invitation-link">Invitation link<input autoComplete="off" readOnly value={link} onFocus={e=>e.target.select()}/></label><div className="invitation-actions"><a className="outline" href={`sms:?body=${encodeURIComponent(body)}`} onClick={()=>setNotice('Choose your recipient in your messaging app. If it does not open, use Copy link.')}>Text</a><a className="outline" href={`mailto:?subject=${encodeURIComponent('Join my ChillAllot household')}&body=${encodeURIComponent(body)}`} onClick={()=>setNotice('Choose your recipient in your email app. If it does not open, use Copy link.')}>Email</a><button type="button" className="primary" onClick={copy}>Copy link</button></div></>:<p role="status">{error||'Preparing your invitation…'}</p>}{notice&&<p role="status">{notice}</p>}</div>
 }
 
-function Dashboard({account,household,onSignOut,households=[],hiddenHouseholds=[],onVisibilityChange,onSwitchHousehold,onJoinHousehold,onUpdateBadge,onRenameHousehold,onMembershipChanged,onLeaveHousehold,preview=false,cloud=false}){
+function Dashboard(props){return <AppUnlockBoundary key={props.account.id} account={props.account} available={props.cloud&&!props.preview} onSignOut={props.onSignOut}><DashboardContent {...props}/></AppUnlockBoundary>}
+function DashboardContent({account,household,onSignOut,households=[],hiddenHouseholds=[],onVisibilityChange,onSwitchHousehold,onJoinHousehold,onUpdateBadge,onRenameHousehold,onMembershipChanged,onLeaveHousehold,preview=false,cloud=false}){
  const householdKey=`.${household.id}`;
  const [snoozeChore,setSnoozeChore]=useState(null),[choreUndo,setChoreUndo]=useState(null);
  React.useEffect(()=>{if(!choreUndo)return;const timer=setTimeout(()=>setChoreUndo(null),10000);return()=>clearTimeout(timer)},[choreUndo]);

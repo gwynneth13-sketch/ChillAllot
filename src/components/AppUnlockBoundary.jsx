@@ -1,0 +1,18 @@
+import React,{createContext,useContext,useEffect,useRef,useState} from 'react';
+import {deviceUnlockSupported,registerUnlock,verifyUnlock,shouldLock} from '../lib/appUnlock.js';
+const Context=createContext(null);
+export const useAppUnlock=()=>useContext(Context);
+export default function AppUnlockBoundary({account,available,onSignOut,children}){
+ const key='chillallot.app-unlock.'+account.id;
+ const [config,setConfig]=useState(()=>{try{const c=JSON.parse(localStorage.getItem(key));return c?.credentialId?{...c,delay:['0','10','30','60'].includes(String(c.delay))?String(c.delay):'30'}:{enabled:false,delay:'30'};}catch{return {enabled:false,delay:'30'}}});
+ const [locked,setLocked]=useState(!!config.enabled),[away,setAway]=useState(false),[busy,setBusy]=useState(false),[error,setError]=useState(''),[supported,setSupported]=useState(null);
+ const hiddenAt=useRef(null),focus=useRef(null),unlockButton=useRef(null);
+ const save=c=>{localStorage.setItem(key,JSON.stringify(c));setConfig(c)};
+ useEffect(()=>{let active=true;deviceUnlockSupported().then(value=>{if(active)setSupported(value)}).catch(()=>{if(active)setSupported(false)});return()=>{active=false}},[]);
+ useEffect(()=>{if(!config.enabled)return;let timer;const hide=()=>{if(hiddenAt.current===null)hiddenAt.current=Date.now();setAway(true);clearTimeout(timer);timer=setTimeout(()=>setLocked(true),Number(config.delay)*1000)};const reveal=()=>{if(shouldLock(hiddenAt.current,Date.now(),config.delay))setLocked(true);hiddenAt.current=null;setAway(false);clearTimeout(timer)};const visibility=()=>document.visibilityState==='hidden'?hide():reveal();document.addEventListener('visibilitychange',visibility);window.addEventListener('pagehide',hide);window.addEventListener('pageshow',visibility);if(document.visibilityState==='hidden')hide();return()=>{clearTimeout(timer);document.removeEventListener('visibilitychange',visibility);window.removeEventListener('pagehide',hide);window.removeEventListener('pageshow',visibility)}},[config.enabled,config.delay]);
+ useEffect(()=>{if(locked){focus.current=document.activeElement;unlockButton.current?.focus()}else focus.current?.focus?.()},[locked]);
+ const run=async action=>{if(busy)return;setBusy(true);setError('');try{await action()}catch(e){setError(e.name==='NotAllowedError'?'Device verification was cancelled. Please try again.':e.message)}finally{setBusy(false)}};
+ const enable=()=>run(async()=>{if(!available||!supported)throw Error('Device unlock is not available here.');const result=await registerUnlock();if(!result.verified||!result.credentialId)throw Error('Device setup was not verified.');save({...config,enabled:true,credentialId:result.credentialId});setLocked(false)});
+ const unlock=()=>run(async()=>{await verifyUnlock(config.credentialId);hiddenAt.current=null;setLocked(false)});
+ return <Context.Provider value={{config,supported,available,busy,error,enable,disable:()=>save({...config,enabled:false}),setDelay:delay=>save({...config,delay})}}><div className="unlock-content" inert={locked||away?true:undefined} style={locked||away?{visibility:'hidden'}:undefined}>{children}</div>{locked&&<div className="app-unlock-screen" role="dialog" aria-modal="true" aria-labelledby="unlock-title"><section className="auth-card"><div className="brand">Chill<span>Allot</span></div><h1 id="unlock-title">Unlock ChillAllot</h1><p>Use your device’s fingerprint, face recognition, or screen lock.</p><button ref={unlockButton} className="primary auth-submit" disabled={busy} onClick={unlock}>{busy?'Verifying…':'Unlock'}</button>{error&&<p role="alert" className="form-message">{error}</p>}<button className="text-button auth-switch" disabled={busy} onClick={onSignOut}>Sign out</button></section></div>}</Context.Provider>;
+}
