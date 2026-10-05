@@ -308,3 +308,9 @@ input[type="number"]{-moz-appearance:textfield;appearance:textfield}input[type="
 .swatches.swatch-2 i:nth-child(1){background:#99433d}
 .swatches.swatch-2 i:nth-child(2){background:#315e9a}
 .swatches.swatch-2 i:nth-child(3){background:#cfaa48}
+
+.app[data-theme="Forest"]{--sage:#c29b43;--accent:#896519}
+.app[data-theme="Forest"] .primary,.app[data-theme="Forest"] .outline{color:#fff}
+.app[data-theme="Forest"] .home-tile:nth-child(3){background:#896519;border-color:#a47e30;color:#fff}
+.app[data-theme="Forest"] .home-tile:nth-child(3) strong,.app[data-theme="Forest"] .home-tile:nth-child(3) small,.app[data-theme="Forest"] .home-tile:nth-child(3) .home-icon{color:#fff}
+.swatches.swatch-2 i:nth-child(3){background:#896519}
