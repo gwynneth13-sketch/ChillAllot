@@ -270,3 +270,5 @@ input[type="number"]{-moz-appearance:textfield;appearance:textfield}input[type="
 .swatches.swatch-4 i:nth-child(3){background:#8c503d}
 
 .app[data-theme="Warm Light"] .primary,.app[data-theme="Warm Light"] .outline{color:#eee8dd}
+
+.settings-nav button>span{display:flex;align-items:center;justify-content:center;color:var(--sage);flex:none}.settings-nav .section-icon{width:18px;height:18px}
