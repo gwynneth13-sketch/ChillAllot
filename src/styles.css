@@ -216,3 +216,7 @@ input[type="number"]{-moz-appearance:textfield;appearance:textfield}input[type="
 @media(max-width:360px){.chore-modal .modal-actions button{padding:7px 6px;font-size:10px}}
 
 .chore-details .supply-summary small{font-size:inherit;font-weight:inherit;line-height:inherit}
+
+.appointment-editor .modal-actions{display:flex;flex-wrap:nowrap;gap:6px;align-items:center;justify-content:flex-end}
+.appointment-editor .modal-actions button{flex:0 1 auto;width:auto;min-width:0;min-height:32px;height:32px;padding:7px 10px;font-size:11px;line-height:16px;font-weight:600;white-space:nowrap}
+@media(max-width:360px){.appointment-editor .modal-actions button{padding:7px 5px;font-size:10px}}
