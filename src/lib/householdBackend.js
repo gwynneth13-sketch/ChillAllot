@@ -22,6 +22,13 @@ export async function signIn({ email, password }) {
 }
 
 export async function signOut() {
+  // Remove this browser's subscription before ending the session on a shared device.
+  if('serviceWorker' in navigator){
+    const reg=await navigator.serviceWorker.getRegistration('/');
+    const subscription=await reg?.pushManager.getSubscription();
+    if(subscription){await subscription.unsubscribe();await requireSupabase().rpc('remove_push_device',{device_endpoint:subscription.endpoint});}
+  }
+  localStorage.removeItem('chillallot.push-account');
   const { error } = await requireSupabase().auth.signOut();
   if (error) throw error;
 }
