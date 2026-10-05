@@ -198,3 +198,15 @@ input[type="number"]{-moz-appearance:textfield;appearance:textfield}input[type="
 .shopping-rename-label{display:block;border:0;background:transparent;color:var(--muted);font-family:inherit;font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:8px 0;cursor:pointer}.shopping-rename-label:focus-visible{outline:2px solid var(--sage);outline-offset:3px}
 
 .shopping-item-edit{border:0;background:transparent;color:var(--text);font-family:inherit;text-align:left;min-width:0;padding:0;cursor:pointer}.shopping-item-edit:focus-visible{outline:2px solid var(--sage);outline-offset:4px}.shopping-item-edit strong,.shopping-item-edit small{overflow-wrap:anywhere}
+
+/* Shared themed checkboxes and list sharing panel. */
+.app input[type="checkbox"]{appearance:none;-webkit-appearance:none;display:inline-grid;place-content:center;width:16px;height:16px;min-height:16px;flex:none;margin:0;padding:0;border:1px solid var(--muted);border-radius:4px;background:var(--bg);color:var(--text);vertical-align:middle;cursor:pointer}
+.app input[type="checkbox"]:checked{background:var(--sage-dark);border-color:var(--sage);color:var(--sage)}
+.app input[type="checkbox"]:checked::after{content:"";width:7px;height:4px;border-left:2px solid currentColor;border-bottom:2px solid currentColor;transform:translateY(-1px) rotate(-45deg)}
+.app input[type="checkbox"]:focus-visible{outline:2px solid var(--sage);outline-offset:3px}
+.app input[type="checkbox"]:disabled{opacity:.45;cursor:default}
+.shopping-tab-add .shopping-sharing{flex:1 0 100%;min-width:0;margin:4px 0;padding:10px 12px 12px;border:1px solid var(--line);border-radius:8px;background:var(--panel)}
+.shopping-sharing legend{padding:0 5px;font-family:inherit;font-size:10px;font-weight:400;color:var(--muted)}
+.shopping-sharing .helper{font-size:10px;line-height:1.5;margin:4px 0 10px;color:var(--muted)}
+.shopping-sharing .chore-member-choices>label{flex:0 1 auto;font-size:11px;color:var(--text);min-height:28px;gap:8px}
+.shopping-tab-add .shopping-sharing input[type="checkbox"]{width:16px;height:16px;min-height:16px;margin:0;padding:0;border-radius:4px}
