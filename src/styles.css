@@ -268,3 +268,5 @@ input[type="number"]{-moz-appearance:textfield;appearance:textfield}input[type="
 
 .app[data-theme="Warm Light"]{--accent:#8c503d}
 .swatches.swatch-4 i:nth-child(3){background:#8c503d}
+
+.app[data-theme="Warm Light"] .primary,.app[data-theme="Warm Light"] .outline{color:#eee8dd}
