@@ -15,6 +15,7 @@ create table if not exists private.bill_reminder_events (
 );
 alter table private.bill_reminder_events enable row level security;
 revoke all on private.bill_reminder_events from public,anon,authenticated,service_role;
+create index if not exists bill_reminder_events_recipient_idx on private.bill_reminder_events(recipient_id);
 
 -- A member may receive bill events only while both membership and payer access hold.
 create or replace function private.bill_recipient_access(h uuid,bill_id text,recipient uuid)
