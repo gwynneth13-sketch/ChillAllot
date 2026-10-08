@@ -29,6 +29,10 @@ Deno.serve(async req=>{
      const access=await checked(admin.rpc('push_list_access',{h:notice.household_id,list_id:notice.item_id,recipient:notice.recipient_id}));
      if(!access){await done('List access ended');continue;}
     }
+    if(notice.section==='Bills'){
+     const current=await checked(admin.rpc('push_bill_notice_current',{notice_id:notice.id}));
+     if(!current){await done('Bill notification no longer applies');continue;}
+    }
     const p=await checked(admin.from('push_preferences').select('*').eq('user_id',notice.recipient_id).eq('household_id',notice.household_id).maybeSingle());
     if(p?.groups?.[notice.section]===false){await done('Group disabled');continue;}
     if(quietAt(new Date(),p)){
@@ -37,6 +41,8 @@ Deno.serve(async req=>{
     }
     const devices=await checked(admin.from('push_devices').select('*').eq('user_id',notice.recipient_id));
     for(const device of devices){
+     // Recheck each device after quiet-hour deferral, retries and earlier sends.
+     if(notice.section==='Bills'&&!await checked(admin.rpc('push_bill_notice_current',{notice_id:notice.id}))){break;}
      if(!allowedEndpoint(device.endpoint))throw Error('Invalid push endpoint');
      const receipt=await checked(admin.from('push_delivery_receipts').select('endpoint').eq('notification_id',notice.id).eq('endpoint',device.endpoint));if(receipt.length)continue;
      const silent=(p?.groups?.Sound??p?.groups?.['Sound & vibration'])===false;
