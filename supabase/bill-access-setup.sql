@@ -22,6 +22,14 @@ select d.household_id, coalesce(nullif(b.item->>'id',''),'legacy-'||b.ordinality
 from public.household_data d cross join lateral jsonb_array_elements(case when jsonb_typeof(d.payload)='array' then d.payload else '[]'::jsonb end) with ordinality b(item,ordinality)
 where d.data_key='bills' on conflict do nothing;
 
+-- Preserve an existing creator's choice while retiring shared reminder defaults.
+-- An explicit personal choice (including off) always wins. Reapplying is safe.
+update private.bills set
+ preferences=case when coalesce(preferences->creator_id::text,'{}') ? 'reminder' then preferences
+ else jsonb_set(preferences,array[creator_id::text],coalesce(preferences->creator_id::text,'{}')||jsonb_build_object('reminder',coalesce(record->>'reminder',''),'reminderTime',coalesce(record->>'reminderTime',''))) end,
+ record=record||jsonb_build_object('reminder','','reminderTime','')
+where creator_id is not null and coalesce(record->>'reminder','')<>'';
+
 -- Restrictive policies combine with the existing membership policies.
 drop policy if exists bills_use_private_storage on public.household_data;
 create policy bills_use_private_storage on public.household_data as restrictive
@@ -53,6 +61,7 @@ begin
   end loop;
   if result->>'reminder'<>'' then
     if result->>'reminder'!~'^Every [0-9]+ (days?|weeks?|hours?|minutes?|months?) before$' then raise exception 'Choose a valid reminder';end if;
+    if length(split_part(result->>'reminder',' ',2))>5 or split_part(result->>'reminder',' ',2)::integer>10000 then raise exception 'Choose a reminder interval from 0 to 10000';end if;
     if result->>'reminder'!~' (hours?|minutes?) before$' and result->>'reminderTime'!~'^([01][0-9]|2[0-3]):[0-5][0-9]$' then raise exception 'Choose a reminder time';end if;
   end if;
   return result;
@@ -84,7 +93,8 @@ begin
   elsif payers<>jsonb_build_array(creator::text) then raise exception 'Choose a split for multiple payers';end if;
   select coalesce(jsonb_agg(jsonb_build_object('userId',s->>'userId','percent',(s->>'percent')::numeric)),'[]') into allocations from jsonb_array_elements(allocations) s;
   result:=jsonb_build_object('name',trim(v->>'name'),'amount',amount,'amountType',case when v->>'amountType'='variable' then 'variable' else 'fixed' end,'due',due::text,'cadence',v->>'cadence','kind',case when v->>'kind'='Auto' then 'Auto' else 'Manual' end,'visibility',visibility,'viewerIds',case when visibility='selected' then viewers else '[]'::jsonb end,'payerIds',payers,'allocations',allocations);
-  return result||private.bill_settings(v);
+  -- Reminder choices belong to the person saving, never to the shared card.
+  return result||(private.bill_settings(v)||jsonb_build_object('reminder','','reminderTime',''));
 end $$;
 
 create or replace function private.bill_workspace(h uuid, op text, bill_id text, v jsonb)
@@ -96,7 +106,10 @@ begin
   if op='create' then
     if length(coalesce(bill_id,'')) not between 1 and 120 then raise exception 'Invalid bill identifier';end if;
     item:=private.validate_bill(h,actor,v);
-    insert into private.bills(household_id,id,creator_id,record) values(h,bill_id,actor,item);
+    s:=private.bill_settings(v);
+    insert into private.bills(household_id,id,creator_id,record,preferences)
+    values(h,bill_id,actor,item,jsonb_build_object(actor::text,jsonb_build_object('reminder',s->>'reminder','reminderTime',s->>'reminderTime')));
+    if v->>'notifyPayers'='true' then perform private.notify_bill_added(h,bill_id);end if;
   elsif op<>'list' then
     select * into b from private.bills where household_id=h and id=bill_id for update;
     if not found or coalesce((b.record->>'deleted')::boolean,false) then raise exception 'Bill not found';end if;
@@ -124,7 +137,8 @@ begin
       if (v->>'expectedRevision')::bigint is distinct from b.revision then raise exception 'This bill changed in another window. Reopen it before saving';end if;
       item:=private.validate_bill(h,actor,v);
       if exists(select 1 from jsonb_array_elements(b.cycles) c where c->>'due'=b.record->>'due' and jsonb_array_length(c->'paidIds')>0) and (item->>'due'<>b.record->>'due' or item->'payerIds'<>b.record->'payerIds' or item->'allocations'<>b.record->'allocations' or item->'amount'<>b.record->'amount') then raise exception 'Undo recorded payments before changing the due date, amount, or payers';end if;
-      update private.bills set record=item,revision=revision+1 where household_id=h and id=bill_id;
+      s:=private.bill_settings(v);
+      update private.bills set record=item,preferences=jsonb_set(preferences,array[actor::text],coalesce(preferences->actor::text,'{}')||jsonb_build_object('reminder',s->>'reminder','reminderTime',s->>'reminderTime')),revision=revision+1 where household_id=h and id=bill_id;
     elsif op='amount' then
       if b.record->>'amountType'<>'variable' or b.record->>'amount' is not null then raise exception 'This bill already has an amount. Refresh to see it';end if;
       if v->>'due' is distinct from b.record->>'due' or (v->>'expectedRevision')::bigint is distinct from b.revision then raise exception 'This bill changed. Reopen Enter amount before saving';end if;
@@ -169,7 +183,7 @@ begin
   -- Never return another member's personal settings, including in history snapshots.
   select coalesce(jsonb_agg(
     case when x.creator_id is null then x.record||jsonb_build_object('id',x.id,'creatorId',null,'cycles','[]'::jsonb)
-    else x.record||coalesce(x.preferences->actor::text,'{}')||jsonb_build_object('id',x.id,'creatorId',x.creator_id::text,'revision',x.revision,'currentPaidIds',coalesce((select c->'paidIds' from jsonb_array_elements(x.cycles) c where c->>'due'=x.record->>'due'),'[]'::jsonb),'defaults',private.bill_settings(x.record),'cycles',coalesce((select jsonb_agg(c||jsonb_build_object('snapshot',(c->'snapshot')||coalesce(x.preferences->actor::text,'{}'))) from jsonb_array_elements(x.cycles) c where c->'paidIds' @> jsonb_build_array(actor::text)),'[]'::jsonb)) end
+    else x.record||jsonb_build_object('reminder','','reminderTime','')||coalesce(x.preferences->actor::text,'{}')||jsonb_build_object('id',x.id,'creatorId',x.creator_id::text,'revision',x.revision,'currentPaidIds',coalesce((select c->'paidIds' from jsonb_array_elements(x.cycles) c where c->>'due'=x.record->>'due'),'[]'::jsonb),'defaults',private.bill_settings(x.record)||jsonb_build_object('reminder','','reminderTime',''),'cycles',coalesce((select jsonb_agg(c||jsonb_build_object('snapshot',(c->'snapshot')||jsonb_build_object('reminder','','reminderTime','')||coalesce(x.preferences->actor::text,'{}'))) from jsonb_array_elements(x.cycles) c where c->'paidIds' @> jsonb_build_array(actor::text)),'[]'::jsonb)) end
     order by x.id),'[]') into result
   from private.bills x where x.household_id=h and not coalesce((x.record->>'deleted')::boolean,false) and ((x.creator_id is null and owner) or x.creator_id=actor or (x.creator_id is not null and (x.record->>'visibility'='household' or (x.record->>'visibility'='selected' and x.record->'viewerIds' @> jsonb_build_array(actor::text)))));
   return result;
