@@ -1,6 +1,6 @@
 # Bill reminder preview package
 
-Prepared October 8, 2026. Implementation is published on the v1-bill-reminders review branch. Hosted bill database updates, worker deployment and Cron activation remain pending. Vercel may automatically build the branch frontend; the phone's existing preview link still points to its earlier version.
+Prepared October 8, 2026. Implementation is published in [draft pull request #1](https://github.com/gwynneth13-sketch/ChillAllot/pull/1), based on notification-inbox-test. GitHub's Vercel deployment reports the [branch preview](https://chill-allot-git-v1-bill-reminders-chill-ad07.vercel.app/) ready. Hosted bill database updates, worker deployment and Cron activation remain pending, so this preview does not yet provide the complete new reminder behavior. The phone's existing preview link still points to its earlier version.
 
 ## Agreed behavior
 
@@ -40,6 +40,8 @@ Local tests do not verify hosted Supabase Cron, PostgREST schema refresh, real c
 ## Deployment order
 
 This project uses administrator-reviewed setup SQL scripts. The additions follow that existing layout. Do not reapply unrelated scripts.
+
+The preview deployments share the hosted database. Applying the bill transition changes shared bill behavior across those deployments, and enabling the producer schedules opted-in payer reminders across eligible households. This is not isolated to a single preview or test household. Review that scope before live activation.
 
 1. Verify the selected Supabase project and source branch. Review live bill/inbox/push definitions against these files, and preserve the current bill data/functions privately for rollback. Avoid exporting credentials, device subscriptions or personal financial records into chat or Git.
 2. Apply the updated `supabase/bill-access-setup.sql` and new `supabase/bill-reminders-setup.sql`, in that order, while the reminder Cron job remains inactive. The latter adds a nullable inbox due date and private deduplication ledger. Its worker access wrapper is restricted to service_role. No new secrets or public table access are required.

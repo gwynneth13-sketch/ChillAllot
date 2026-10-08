@@ -57,7 +57,7 @@ Persistence API reviewed against [Supabase upsert documentation](https://supabas
 
 ## Bill reminder implementation package — October 8
 
-Local implementation and tests are complete. Code is published on v1-bill-reminders for review; hosted database updates, worker deployment, Cron activation and real-phone bill acceptance remain pending. Vercel may build branch previews automatically.
+Local implementation and tests are complete. Code is published in [draft pull request #1](https://github.com/gwynneth13-sketch/ChillAllot/pull/1) on v1-bill-reminders; hosted database updates, worker deployment, Cron activation and real-phone bill acceptance remain pending. GitHub's Vercel deployment reports the branch frontend ready. Its shared database still needs the matching reviewed updates before full reminder acceptance.
 
 - [x] Confirmed recipient decision: bill reminders and optional bill-added notices go only to payers. The creator can choose whether to notify other payers when adding a split bill.
 - [x] Confirmed shared-card rule for bills, appointments and chores: creator reminder remains personal. A recipient starts with **Set reminder**, chooses their own timing, and taps the visible timing later to change it. Implemented for bills; appointment/chore changes are still pending.
