@@ -1,6 +1,6 @@
 # Bill reminder preview package
 
-Prepared October 8, 2026. Implementation is published in [draft pull request #1](https://github.com/gwynneth13-sketch/ChillAllot/pull/1), based on notification-inbox-test. GitHub's Vercel deployment reports the [branch preview](https://chill-allot-git-v1-bill-reminders-chill-ad07.vercel.app/) ready. Hosted bill database updates, worker deployment and Cron activation remain pending, so this preview does not yet provide the complete new reminder behavior. The phone's existing preview link still points to its earlier version.
+Activated for preview testing October 8, 2026 after the user's approval. Implementation is published in [draft pull request #1](https://github.com/gwynneth13-sketch/ChillAllot/pull/1), based on notification-inbox-test. The [branch preview](https://chill-allot-git-v1-bill-reminders-chill-ad07.vercel.app/) is available. The shared hosted bill functions, matching delivery worker and minute scheduler are now activated. Main remains unmerged, and physical-phone bill acceptance is still pending. Use this new preview address when testing; the phone's older address still loads the earlier frontend.
 
 ## Agreed behavior
 
@@ -36,6 +36,19 @@ The production frontend build, worker TypeScript syntax check and whitespace che
 Run `npm ci` and `npm test`; run `npm run build` for the frontend. The worker tests require Node's `stripTypeScriptTypes` API; the tested runtime is Node 24. The pinned PGlite package is a development dependency only.
 
 Local tests do not verify hosted Supabase Cron, PostgREST schema refresh, real concurrent database sessions, deployed Deno imports, or physical-phone bill delivery. Those are deployment/acceptance gates.
+
+## Hosted activation checks — October 8
+
+- Verified all five original bill function bodies and the deployed worker source matched the saved starting version before replacing them.
+- Preserved all three bill records, the five original functions and the storage policy in an administrator-only private backup. Preserved the old worker source privately for rollback.
+- Applied the two reviewed bill scripts in one transaction and requested the PostgREST schema reload. Bill amounts, creator identities, revisions and payment history are unchanged; no existing personal fields were lost.
+- Hosted rollback-only assertions passed using two existing account identities in the named test household: optional notice recipients, no inherited reminder, personal note/time isolation, creator-only editing, due-event creation, delivery validation, occurrence deduplication, immediate opt-out/cancellation and exclusion of visibility-only members. The test transaction left zero bills and zero notifications behind.
+- Reloaded the deployed worker's Code page and verified it exactly matches the reviewed source. The existing delivery job remains active; it calls the worker only when queue work exists.
+- The named bill-reminders job is active once a minute. Its first two runs succeeded at 10:41 and 10:42 AM CDT. No real bill reminders were due during the activation census.
+- The real signed-in G2 preview displays the new Set reminder link and an existing saved personal reminder. Full two-account browser editing and physical-phone scheduled delivery remain acceptance work.
+- Checked Supabase advisors. No-policy notices on the private bill, ledger and backup tables reflect deliberate denial of direct app access; ordinary roles cannot run the producer or delivery validator. Added the recipient foreign-key index on the new ledger and reran all 20 tests successfully. Existing unrelated advisor findings remain part of the V1 security/performance review.
+
+The first scheduled execution checks verify the producer. They do not replace a real due-time phone test or a deployed worker request with a bill event.
 
 ## Deployment order
 

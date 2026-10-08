@@ -47,7 +47,7 @@ The user currently reports being able to read and tap the interface. Small mobil
 
 ## First implementation package
 
-Initially prepared locally; now included on v1-bill-reminders for review. No merge, hosted SQL update, worker deployment or Cron activation has occurred. The patch starts from notification-inbox-test at 933f346.
+Initially prepared locally; now included on v1-bill-reminders for review. The bill package below was subsequently activated with user approval; no merge has occurred. The patch starts from notification-inbox-test at 933f346.
 
 Changes: PushPreferenceSync now binds readiness to account/household, resets errors on reload, handles rejected loads, and uses a scoped serialized writer. The writer coalesces pending edits, prevents overlapping writes, suppresses late callbacks after disposal and handles thrown/returned failures. Added a repeatable test command with no new dependencies.
 
@@ -57,7 +57,7 @@ Persistence API reviewed against [Supabase upsert documentation](https://supabas
 
 ## Bill reminder implementation package — October 8
 
-Local implementation and tests are complete. Code is published in [draft pull request #1](https://github.com/gwynneth13-sketch/ChillAllot/pull/1) on v1-bill-reminders; hosted database updates, worker deployment, Cron activation and real-phone bill acceptance remain pending. GitHub's Vercel deployment reports the branch frontend ready. Its shared database still needs the matching reviewed updates before full reminder acceptance.
+Implementation is published in [draft pull request #1](https://github.com/gwynneth13-sketch/ChillAllot/pull/1) on v1-bill-reminders. With explicit user approval, the shared hosted bill functions and matching worker were updated and the named reminder scheduler enabled. Hosted assertions and the first two scheduled runs pass. Real-phone bill acceptance and full two-account browser checks remain pending; main remains unmerged. Use the [new preview](https://chill-allot-git-v1-bill-reminders-chill-ad07.vercel.app/) for acceptance.
 
 - [x] Confirmed recipient decision: bill reminders and optional bill-added notices go only to payers. The creator can choose whether to notify other payers when adding a split bill.
 - [x] Confirmed shared-card rule for bills, appointments and chores: creator reminder remains personal. A recipient starts with **Set reminder**, chooses their own timing, and taps the visible timing later to change it. Implemented for bills; appointment/chore changes are still pending.
@@ -67,6 +67,6 @@ Local implementation and tests are complete. Code is published in [draft pull re
 - [x] Exact bill routes select Upcoming, Overdue or Paid, clear conflicting search and focus the corresponding card. Unavailable/changed items show a neutral message.
 - [x] Twenty automated tests pass, including actual feature SQL in local PostgreSQL/PGlite, worker execution with test transport adapters, routing and preference-write regressions. Production build and worker syntax check pass.
 - [x] Local browser checks at 390 CSS pixels: Set reminder opens the personal editor; chosen timing survives reload; turning it off restores Set reminder. Mounted card-routing fixture clears a conflicting search, opens/focuses an overdue card and handles an inaccessible target.
-- [ ] Deploy the reviewed bill database functions, matching worker and preview frontend; activate one named Cron producer only after account/permission checks. See BILL-REMINDER-REVIEW.md for order and rollback.
+- [x] Deploy the reviewed bill database functions, matching worker and preview frontend; activate one named Cron producer after account/permission checks. Preserved a private rollback backup; all three bill records, amounts/history and existing personal fields were preserved. Hosted rollback-only checks left no test data. The first two Cron runs succeeded. See BILL-REMINDER-REVIEW.md for verification, order and rollback.
 - [ ] Real phone/two-account bill acceptance: optional creator notice, separate reminder choices, scheduled delivery with app closed, exact card route, quiet hours, payment/edit cancellation and duplicate prevention. Earlier successful Shopping push tests do not satisfy these bill checks.
 - [ ] Follow with the same personal reminder flow for appointments, then chores. Chores currently use a shared document; personal preferences require a backend change before promising personal reminders.
