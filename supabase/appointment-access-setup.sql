@@ -40,6 +40,7 @@ begin
   prefs:=jsonb_build_object(actor::text,pref);
   -- Other members choose their own reminders. Ignore older clients' memberReminders.
   insert into private.appointments(household_id,id,creator_id,record,preferences) values(h,aid,actor,item,prefs);
+  if v ? 'notifyMemberIds' and v->'notifyMemberIds'<>'[]'::jsonb then perform private.notify_appointment_members(h,aid,v->'notifyMemberIds',false);end if;
  elsif op<>'list' then
   select * into a from private.appointments where household_id=h and id=aid for update;
   if not found or coalesce((a.preferences->actor::text->>'removed')::boolean,false) then raise exception 'Appointment not found';end if;
@@ -53,6 +54,7 @@ begin
    if a.creator_id is distinct from actor then raise exception 'Only the creator can edit appointment details';end if;
    if (v->>'expectedRevision')::bigint is distinct from a.revision then raise exception 'This appointment changed in another window. Reopen it before saving';end if;
    update private.appointments set record=item,preferences=jsonb_set(preferences,array[actor::text],pref),revision=revision+1 where household_id=h and id=aid;
+   if v ? 'notifyMemberIds' and v->'notifyMemberIds'<>'[]'::jsonb then perform private.notify_appointment_members(h,aid,v->'notifyMemberIds',true);end if;
   elsif op='delete' then
    if a.creator_id is distinct from actor then raise exception 'Only the creator can delete an appointment';end if;
    if (v->>'expectedRevision')::bigint is distinct from a.revision then raise exception 'This appointment changed. Reopen it before deleting';end if;
