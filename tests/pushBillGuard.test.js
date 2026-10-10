@@ -6,9 +6,9 @@ import {readFile} from 'node:fs/promises';
 
 // Execute the actual worker handler with test database/transport adapters.
 // No real credentials, network calls or push subscriptions are used.
-async function worker({access=[true,true],quiet=false,read=false}={}){
+async function worker({access=[true,true],quiet=false,read=false,section='Bills'}={}){
  const calls=[],updates=[];let sends=0,handler;
- const notice={id:'00000000-0000-0000-0000-000000000001',household_id:'home',recipient_id:'payer',section:'Bills',item_id:'rent',title:'Rent',detail:'Due soon',read_at:read?'read':null};
+ const notice={id:'00000000-0000-0000-0000-000000000001',household_id:'home',recipient_id:'payer',section,item_id:'rent',title:'Rent',detail:'Due soon',read_at:read?'read':null};
  const job={notification_id:notice.id,attempts:1};
  const device={endpoint:'https://fcm.googleapis.com/test-only',subscription:{}};
  const admin={rpc(name,args){calls.push({name,args});return Promise.resolve({data:name==='claim_push_jobs'?[job]:access.length>1?access.shift():access[0]});},from(table){
@@ -42,4 +42,13 @@ test('quiet hours defer a valid bill reminder without sending or consuming a ret
  const result=await worker({quiet:true});assert.equal(result.sends,0);
  assert.equal(result.updates[0].value.available_at,'2026-10-08T23:59:00.000Z');
  assert.equal(result.updates[0].value.attempts,0);
+});
+
+test('appointment delivery is checked before processing and before each device send',async()=>{
+ const stopped=await worker({section:'Appointments',access:[false]});assert.equal(stopped.sends,0);
+ assert.equal(stopped.updates[0].value.last_error,'Appointment notification no longer applies');
+ const changed=await worker({section:'Appointments',access:[true,false]});assert.equal(changed.sends,0);
+ assert.equal(changed.calls.filter(c=>c.name==='push_appointment_notice_current').length,2);
+ const valid=await worker({section:'Appointments'});assert.equal(valid.sends,1);
+ const quiet=await worker({section:'Appointments',quiet:true});assert.equal(quiet.sends,0);assert.equal(quiet.updates[0].value.attempts,0);
 });
