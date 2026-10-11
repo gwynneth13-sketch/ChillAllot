@@ -1,20 +1,27 @@
 import React,{useEffect,useRef,useState} from 'react';
 
-export default function AppointmentCards({appointments,account,members,today,focusRequest,onReminder,onEdit,onRemove,onAssign,ui}){
+export default function AppointmentCards({appointments,account,members,today,focusRequest,onFocusHandled,onReminder,onEdit,onRemove,onAssign,ui}){
  const [focused,setFocused]=useState(null),[routeError,setRouteError]=useState('');
  const handled=useRef(null),card=useRef(null);
  useEffect(()=>{
   if(!focusRequest||handled.current===focusRequest)return;
   handled.current=focusRequest;
   const target=appointments.find(a=>a.id===focusRequest.appointmentId);
-  setFocused(target?.id||null);
+  setFocused(target?{id:target.id,request:focusRequest}:null);
   setRouteError(target?'':'This appointment was removed, changed, or is no longer shared with you.');
- },[focusRequest,appointments]);
- useEffect(()=>{if(focused){card.current?.scrollIntoView({block:'center'});card.current?.focus({preventScroll:true});}},[focused,focusRequest]);
+  // Consume navigation once so a later page mount cannot replay an old notice.
+  onFocusHandled?.(focusRequest);
+ },[focusRequest,appointments,onFocusHandled]);
+ useEffect(()=>{
+  if(!focused)return;
+  card.current?.scrollIntoView({block:'center'});card.current?.focus({preventScroll:true});
+  const timer=setTimeout(()=>setFocused(null),10000);
+  return ()=>clearTimeout(timer);
+ },[focused]);
  const {formatReminderTime,formatDateDisplay,reminderLabel}=ui;
  return <>
   {routeError&&<p className="form-message" role="status">{routeError}</p>}
-  <div className="card-list">{appointments.map(a=><article className={'appointment-card'+(focused===a.id?' appointment-notification-target':'')} key={a.id} tabIndex={-1} ref={focused===a.id?card:null}>
+  <div className="card-list">{appointments.map(a=><article className={'appointment-card'+(focused?.id===a.id?' appointment-notification-target':'')} key={a.id} tabIndex={-1} ref={focused?.id===a.id?card:null} onClick={()=>setFocused(null)}>
    <div className="appointment-body"><div className="appt-heading"><strong>{a.name}</strong>
     {a.date&&a.date<today&&<button type="button" className="outline small old-appointment" onClick={()=>onRemove(a)}>Delete old appointment</button>}
     <span className="tag">{a.for?`FOR ${a.for.toUpperCase()}`:'HOUSEHOLD'}</span>{a.video&&<span className="tag violet">VIDEO</span>}
