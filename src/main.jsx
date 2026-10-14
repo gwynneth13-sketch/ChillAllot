@@ -1,6 +1,7 @@
 import PushPreferences from './components/PushPreferences.jsx';
 import PushPreferenceSync from './components/PushPreferenceSync.jsx';
 import {useNotificationInbox} from './lib/notificationInbox.js';
+import {installPopupViewport} from './lib/popupViewport.js';
 import AppUnlockBoundary,{useAppUnlock,SignOutAction} from './components/AppUnlockBoundary.jsx';
 import UnlockPreferences from './components/UnlockPreferences.jsx';
 import NotificationInbox from './components/NotificationInbox.jsx';
@@ -221,4 +222,6 @@ function CloudApp(){
 
 function RootApp(){const params=new URLSearchParams(window.location.search);const previewRequested=params.has('preview');if(previewRequested&&params.get('resetPreview')==='1'){for(const key of Object.keys(localStorage)){if(key.startsWith('chillallot.')&&(key.endsWith('.preview')||key==='chillallot.badge.preview'))localStorage.removeItem(key)}params.delete('resetPreview');window.history.replaceState(null,'',`${window.location.pathname}?${params.toString()}${window.location.hash}`)}return isSupabaseConfigured&&!previewRequested?<CloudApp/>:<App/>}
 
+const stopPopupViewport = installPopupViewport();
+if (import.meta.hot) import.meta.hot.dispose(stopPopupViewport);
 createRoot(document.getElementById('root')).render(<RootApp/>);

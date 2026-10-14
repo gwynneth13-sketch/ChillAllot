@@ -346,3 +346,51 @@ input[type="number"]{-moz-appearance:textfield;appearance:textfield}input[type="
 .household-hide-dialog{position:fixed;inset:0;margin:auto;width:min(400px,calc(100vw - 32px));max-height:calc(100svh - 32px);overflow:auto;padding:24px;border:1px solid var(--line);border-radius:16px;background:var(--panel);color:var(--text);text-align:left}.household-hide-dialog::backdrop{background:#0008}.household-hide-dialog h2{font:700 20px Manrope,sans-serif;margin-bottom:12px}.household-hide-dialog .modal-description{font-size:13px;line-height:1.6}.household-hide-dialog .modal-actions{display:flex;gap:10px;justify-content:stretch}.household-hide-dialog .modal-actions button{flex:1;min-width:0;height:36px;margin:0;padding:6px;font-size:12px;line-height:1.3;white-space:nowrap;text-align:center}
 
 .bill-reminder-link,.appointment-reminder-link{font-size:14px;min-height:32px;padding:6px 0;text-align:left;align-self:flex-start}.bill-notification-target,.appointment-notification-target{outline:2px solid var(--accent);outline-offset:3px;scroll-margin-top:72px}
+
+/* Keep phone form text readable without iOS focus zoom. */
+@media (max-width: 640px) {
+  input:not([type=checkbox]):not([type=radio]):not([type=range]):not([type=color]):not([type=button]):not([type=submit]):not([type=reset]):not([type=file]),
+  textarea,
+  select {
+    font-size: 16px !important;
+  }
+}
+
+/* Keep app controls inside the device safe area, including landscape. */
+body {
+  padding: env(safe-area-inset-top, 0px) env(safe-area-inset-right, 0px) env(safe-area-inset-bottom, 0px) env(safe-area-inset-left, 0px);
+}
+.app, .auth-shell, .unlock-shell {
+  min-height: calc(100svh - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px));
+}
+.overlay, .app-unlock-screen, .signout-overlay {
+  padding-top: max(20px, env(safe-area-inset-top, 0px));
+  padding-right: max(20px, env(safe-area-inset-right, 0px));
+  padding-bottom: max(20px, env(safe-area-inset-bottom, 0px));
+  padding-left: max(20px, env(safe-area-inset-left, 0px));
+}
+
+/* Use the area above the software keyboard; only the dialog scrolls. */
+.overlay {
+  top: var(--popup-viewport-top, 0px);
+  left: var(--popup-viewport-left, 0px);
+  right: auto;
+  bottom: auto;
+  width: var(--popup-viewport-width, 100vw);
+  height: var(--popup-viewport-height, 100dvh);
+  grid-template-rows: minmax(0, 1fr);
+  overflow: hidden;
+}
+.overlay > .modal {
+  min-width: 0;
+  max-width: 100%;
+  min-height: 0;
+  max-height: 100%;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior-x: none;
+  overscroll-behavior-y: contain;
+  touch-action: pan-y pinch-zoom;
+  -webkit-overflow-scrolling: touch;
+  scroll-padding-block: 16px;
+}
