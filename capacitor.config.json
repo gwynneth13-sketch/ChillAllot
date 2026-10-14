@@ -1,5 +1,10 @@
 {
   "appId": "com.gwynneth13.chillallot",
   "appName": "ChillAllot",
-  "webDir": "dist"
+  "webDir": "dist",
+  "plugins": {
+    "PushNotifications": {
+      "presentationOptions": ["banner", "list", "sound"]
+    }
+  }
 }

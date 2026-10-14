@@ -1,4 +1,5 @@
 import { requireSupabase } from './supabase.js';
+import {iosPush} from './iosPush.js';
 
 export async function createAccount({ email, password, name, emailRedirectTo }) {
   const client = requireSupabase();
@@ -22,6 +23,7 @@ export async function signIn({ email, password }) {
 }
 
 export async function signOut() {
+  if (iosPush) await iosPush.disable();
   // Remove this browser's subscription before ending the session on a shared device.
   if('serviceWorker' in navigator){
     const reg=await navigator.serviceWorker.getRegistration('/');
@@ -29,7 +31,7 @@ export async function signOut() {
     if(subscription){await subscription.unsubscribe();await requireSupabase().rpc('remove_push_device',{device_endpoint:subscription.endpoint});}
   }
   localStorage.removeItem('chillallot.push-account');
-  const { error } = await requireSupabase().auth.signOut();
+  const { error } = await requireSupabase().auth.signOut({scope:'local'});
   if (error) throw error;
 }
 

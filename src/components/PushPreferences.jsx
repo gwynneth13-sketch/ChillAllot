@@ -1,8 +1,13 @@
 import React,{useEffect,useState} from 'react';
 import {supabase} from '../lib/supabase.js';
 import {pushPublicKey as publicKey} from '../lib/pushPublicKey.js';
+import {isNativeIos} from '../lib/iosPush.js';
+import IosPushPreferences from './IosPushPreferences.jsx';
 function keyBytes(value){const raw=atob(value.replace(/-/g,'+').replace(/_/g,'/'));return Uint8Array.from(raw,c=>c.charCodeAt(0));}
-export default function PushPreferences({account,cloud}){
+export default function PushPreferences(props){
+ return isNativeIos?<IosPushPreferences {...props}/>:<WebPushPreferences {...props}/>;
+}
+function WebPushPreferences({account,cloud}){
  const [enabled,setEnabled]=useState(false),[busy,setBusy]=useState(false),[error,setError]=useState('');
  const supported=typeof window!=='undefined'&&window.isSecureContext&&'serviceWorker' in navigator&&'PushManager' in window&&'Notification' in window;
  useEffect(()=>{let alive=true;if(supported&&cloud)navigator.serviceWorker.getRegistration('/').then(async reg=>{const sub=await reg?.pushManager.getSubscription();if(!sub)return;const {data}=await supabase.from('push_devices').select('endpoint').eq('endpoint',sub.endpoint).eq('user_id',account.id);if(alive)setEnabled(Boolean(data?.length&&Notification.permission==='granted'));}).catch(()=>{});return()=>{alive=false}},[account.id,cloud]);
